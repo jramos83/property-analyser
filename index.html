@@ -80,6 +80,9 @@
     .prop-card:hover { border-color: var(--accent); transform: translateY(-2px); }
     .prop-card.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(79,124,255,.3); }
     .prop-card-checkbox { position: absolute; top: 12px; left: 12px; z-index: 2; width: 20px; height: 20px; accent-color: var(--accent); cursor: pointer; }
+    .prop-card-delete { position: absolute; top: 10px; right: 10px; z-index: 3; width: 26px; height: 26px; border-radius: 50%; background: rgba(239,68,68,.85); border: none; color: #fff; font-size: 15px; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: opacity .15s; }
+    .prop-card:hover .prop-card-delete { opacity: 1; }
+    .prop-card-delete:hover { background: var(--red); }
     .prop-img { width: 100%; height: 180px; background: linear-gradient(135deg, var(--surface2) 0%, #1e2236 100%); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 13px; position: relative; }
     .prop-img-icon { font-size: 48px; opacity: .3; }
     .prop-card-body { padding: 16px; }
@@ -396,7 +399,7 @@ function AddPropertyModal({ onClose, onAdd }) {
 
 
 // ── Property Card (home grid) ───────────────────────────────────────────────
-function PropertyCard({ property: p, selected, onSelect, onClick }) {
+function PropertyCard({ property: p, selected, onSelect, onClick, onDelete }) {
   const { listing: l = {}, score = {}, valuation: v = {}, rental: r = {}, rent_assessment: ra = {} } = p;
   const isRental = p.analysis_type === 'rental';
   const redFlags = (p.due_diligence?.red_flags || []).filter(f => f.severity === 'high' || f.severity === 'medium').length;
@@ -415,6 +418,11 @@ function PropertyCard({ property: p, selected, onSelect, onClick }) {
         onChange={(e) => { e.stopPropagation(); onSelect(p.id); }}
         onClick={(e) => e.stopPropagation()}
       />
+      <button
+        className="prop-card-delete"
+        title="Delete"
+        onClick={e => { e.stopPropagation(); if (confirm('Delete this property?')) onDelete(p.id); }}
+      >×</button>
       <div className="prop-img">
         <div className="prop-img-icon">{isRental ? '🔑' : '🏠'}</div>
         {isRental
@@ -1293,7 +1301,7 @@ function ComparisonView({ properties, onClear, onViewProperty }) {
 }
 
 // ── Home View ───────────────────────────────────────────────────────────────
-function HomeView({ properties, onAddProperty, onView, selectedIds, onToggleSelect, onCompare }) {
+function HomeView({ properties, onAddProperty, onView, selectedIds, onToggleSelect, onCompare, onDelete, onDeleteSelected }) {
   const [sort, setSort] = useState('date');
   const [filter, setFilter] = useState('all'); // 'all' | 'buy' | 'rent'
 
@@ -1333,6 +1341,13 @@ function HomeView({ properties, onAddProperty, onView, selectedIds, onToggleSele
               ⇔ Compare {selectedIds.length}
             </button>
           )}
+          {selectedIds.length >= 1 && (
+            <button className="btn btn-danger btn-sm" onClick={() => {
+              if (confirm(`Delete ${selectedIds.length} propert${selectedIds.length === 1 ? 'y' : 'ies'}?`)) onDeleteSelected(selectedIds);
+            }}>
+              🗑 Delete {selectedIds.length}
+            </button>
+          )}
         </div>
       </div>
 
@@ -1360,6 +1375,7 @@ function HomeView({ properties, onAddProperty, onView, selectedIds, onToggleSele
               selected={selectedIds.includes(p.id)}
               onSelect={onToggleSelect}
               onClick={onView}
+              onDelete={onDelete}
             />
           ))}
         </div>
@@ -1493,6 +1509,12 @@ function App() {
     setActiveProperty(null);
   };
 
+  const handleDeleteSelected = (ids) => {
+    const idSet = new Set(ids);
+    setProperties(prev => prev.filter(p => !idSet.has(p.id)));
+    setSelectedIds([]);
+  };
+
   const handleToggleSelect = (id) => {
     setSelectedIds(prev =>
       prev.includes(id) ? prev.filter(s => s !== id) : prev.length < 5 ? [...prev, id] : prev
@@ -1578,6 +1600,8 @@ function App() {
             selectedIds={selectedIds}
             onToggleSelect={handleToggleSelect}
             onCompare={handleCompare}
+            onDelete={handleDelete}
+            onDeleteSelected={handleDeleteSelected}
           />
         )}
         {view === 'report' && activeProperty && (
