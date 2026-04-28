@@ -1368,35 +1368,117 @@ function HomeView({ properties, onAddProperty, onView, selectedIds, onToggleSele
   );
 }
 
+// ── GitHub sync ──────────────────────────────────────────────────────────────
+const GH_API = 'https://api.github.com/repos/jramos83/property-analyser/contents/properties.json';
+const PAT_KEY = 'gh_pat';
+
+async function githubSave(props) {
+  const pat = localStorage.getItem(PAT_KEY);
+  if (!pat) return 'no-pat';
+  const headers = { Authorization: `token ${pat}`, 'Content-Type': 'application/json' };
+  const getRes = await fetch(GH_API, { headers });
+  if (!getRes.ok) throw new Error(`GitHub read failed: ${getRes.status}`);
+  const { sha } = await getRes.json();
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(props, null, 2))));
+  const putRes = await fetch(GH_API, {
+    method: 'PUT',
+    headers,
+    body: JSON.stringify({ message: `Update properties (${props.length})`, content, sha }),
+  });
+  if (!putRes.ok) throw new Error(`GitHub write failed: ${putRes.status}`);
+}
+
+// ── GitHub sync settings modal ───────────────────────────────────────────────
+function SyncSettingsModal({ onClose }) {
+  const [pat, setPat] = React.useState(localStorage.getItem(PAT_KEY) || '');
+  const save = () => {
+    if (pat.trim()) localStorage.setItem(PAT_KEY, pat.trim());
+    else localStorage.removeItem(PAT_KEY);
+    onClose();
+  };
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal" style={{maxWidth:500}}>
+        <div className="modal-header">
+          <span className="modal-title">☁ Auto-sync Setup</span>
+          <button className="modal-close" onClick={onClose}>×</button>
+        </div>
+        <div className="modal-body">
+          <p className="hint" style={{marginBottom:12}}>
+            Enter a GitHub fine-grained Personal Access Token with <strong>Contents: Read and Write</strong> access to the <code>jramos83/property-analyser</code> repo. The token is stored only in this browser.
+          </p>
+          <p className="hint" style={{marginBottom:16}}>
+            Create one at: <strong>GitHub → Settings → Developer settings → Fine-grained tokens</strong>
+          </p>
+          <input
+            type="password"
+            style={{width:'100%',padding:'12px 14px',background:'#0a0c14',border:'1px solid var(--border)',borderRadius:'var(--radius-sm)',color:'var(--text)',fontSize:14,fontFamily:'monospace'}}
+            value={pat}
+            onChange={e => setPat(e.target.value)}
+            placeholder="github_pat_..."
+            autoFocus
+          />
+        </div>
+        <div className="modal-footer">
+          {localStorage.getItem(PAT_KEY) && (
+            <button className="btn btn-danger btn-sm" onClick={() => { localStorage.removeItem(PAT_KEY); onClose(); }}>Clear token</button>
+          )}
+          <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
+          <button className="btn btn-primary" onClick={save}>Save</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Root App ────────────────────────────────────────────────────────────────
 function App() {
   const [properties, setProperties] = useState(loadProperties);
-  const [view, setView] = useState('home'); // 'home' | 'report' | 'compare'
+  const [view, setView] = useState('home');
   const [activeProperty, setActiveProperty] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showSyncModal, setShowSyncModal] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [syncStatus, setSyncStatus] = useState('idle'); // 'idle'|'saving'|'saved'|'error'
+  const saveTimer = useRef(null);
+  const initialized = useRef(false);
 
   useEffect(() => { saveProperties(properties); }, [properties]);
 
-  // On startup, fetch properties from S3
+  // On startup, fetch from GitHub Pages (same origin) and merge
   useEffect(() => {
-    fetch('https://property-analyser-app.s3.ap-southeast-2.amazonaws.com/data/properties.json')
+    fetch('properties.json')
       .then(r => r.ok ? r.json() : null)
       .then(remote => {
         if (!remote || !remote.length) return;
         setProperties(local => mergeProps(local, remote));
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => { initialized.current = true; });
   }, []);
+
+  // Auto-save to GitHub 1.5s after any change
+  useEffect(() => {
+    if (!initialized.current) return;
+    clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(async () => {
+      setSyncStatus('saving');
+      try {
+        const result = await githubSave(properties);
+        if (result === 'no-pat') { setSyncStatus('idle'); return; }
+        setSyncStatus('saved');
+        setTimeout(() => setSyncStatus('idle'), 2500);
+      } catch {
+        setSyncStatus('error');
+        setTimeout(() => setSyncStatus('idle'), 4000);
+      }
+    }, 1500);
+  }, [properties]);
 
   const handleAdd = (data) => {
     setProperties(prev => {
       const exists = prev.findIndex(p => p.id === data.id);
-      if (exists >= 0) {
-        const updated = [...prev];
-        updated[exists] = data;
-        return updated;
-      }
+      if (exists >= 0) { const u = [...prev]; u[exists] = data; return u; }
       return [data, ...prev];
     });
     setShowAddModal(false);
@@ -1413,34 +1495,11 @@ function App() {
 
   const handleToggleSelect = (id) => {
     setSelectedIds(prev =>
-      prev.includes(id)
-        ? prev.filter(s => s !== id)
-        : prev.length < 5 ? [...prev, id] : prev
+      prev.includes(id) ? prev.filter(s => s !== id) : prev.length < 5 ? [...prev, id] : prev
     );
   };
 
   const handleCompare = () => setView('compare');
-
-  const [syncing, setSyncing] = React.useState(false);
-
-  const handleSync = async () => {
-    setSyncing(true);
-    try {
-      const res = await fetch('http://localhost:3001/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(properties),
-      });
-      const merged = await res.json();
-      if (!res.ok) throw new Error(merged.error || 'Sync failed');
-      setProperties(merged);
-      alert(`Synced ✓  ${merged.length} propert${merged.length !== 1 ? 'ies' : 'y'} on S3.`);
-    } catch (e) {
-      alert(`Sync failed: ${e.message}`);
-    } finally {
-      setSyncing(false);
-    }
-  };
 
   const handleExport = () => {
     const blob = new Blob([JSON.stringify(properties, null, 2)], { type: 'application/json' });
@@ -1469,19 +1528,22 @@ function App() {
           });
           return merged;
         });
-        alert(`Imported ${incoming.length} propert${incoming.length !== 1 ? 'ies' : 'y'}.`);
-      } catch {
-        alert('Invalid JSON file.');
-      }
+      } catch { alert('Invalid JSON file.'); }
     };
     reader.readAsText(file);
     e.target.value = '';
   };
 
-  const handleViewProperty = (p) => {
-    setActiveProperty(p);
-    setView('report');
-  };
+  const hasPat = !!localStorage.getItem(PAT_KEY);
+  const syncLabel = syncStatus === 'saving' ? '↻ Saving…'
+                  : syncStatus === 'saved'  ? '✓ Saved'
+                  : syncStatus === 'error'  ? '⚠ Sync error'
+                  : hasPat                  ? '☁ Synced'
+                  :                          '☁ Set up sync';
+  const syncColor = syncStatus === 'saved'  ? 'var(--green)'
+                  : syncStatus === 'error'  ? 'var(--red)'
+                  : hasPat                  ? 'var(--accent)'
+                  :                          undefined;
 
   const selectedProperties = properties.filter(p => selectedIds.includes(p.id));
 
@@ -1497,8 +1559,8 @@ function App() {
         {selectedIds.length >= 2 && view !== 'compare' && (
           <button className="btn btn-secondary btn-sm" onClick={handleCompare}>⇔ Compare {selectedIds.length}</button>
         )}
-        <button className="btn btn-ghost btn-sm" onClick={handleSync} disabled={syncing} title="Sync to S3">
-          {syncing ? '↻ Syncing…' : '☁ Sync'}
+        <button className="btn btn-ghost btn-sm" onClick={() => setShowSyncModal(true)} style={{color: syncColor}}>
+          {syncLabel}
         </button>
         <button className="btn btn-ghost btn-sm" onClick={handleExport} title="Export all properties">⬇ Export</button>
         <label className="btn btn-ghost btn-sm" title="Import properties from file" style={{cursor:'pointer'}}>
@@ -1512,34 +1574,26 @@ function App() {
           <HomeView
             properties={properties}
             onAddProperty={() => setShowAddModal(true)}
-            onView={handleViewProperty}
+            onView={p => { setActiveProperty(p); setView('report'); }}
             selectedIds={selectedIds}
             onToggleSelect={handleToggleSelect}
             onCompare={handleCompare}
           />
         )}
         {view === 'report' && activeProperty && (
-          <PropertyReport
-            property={activeProperty}
-            onBack={() => setView('home')}
-            onDelete={handleDelete}
-          />
+          <PropertyReport property={activeProperty} onBack={() => setView('home')} onDelete={handleDelete} />
         )}
         {view === 'compare' && (
           <ComparisonView
             properties={selectedProperties}
             onClear={() => { setSelectedIds([]); setView('home'); }}
-            onViewProperty={handleViewProperty}
+            onViewProperty={p => { setActiveProperty(p); setView('report'); }}
           />
         )}
       </main>
 
-      {showAddModal && (
-        <AddPropertyModal
-          onClose={() => setShowAddModal(false)}
-          onAdd={handleAdd}
-        />
-      )}
+      {showAddModal && <AddPropertyModal onClose={() => setShowAddModal(false)} onAdd={handleAdd} />}
+      {showSyncModal && <SyncSettingsModal onClose={() => setShowSyncModal(false)} />}
     </div>
   );
 }
