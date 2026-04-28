@@ -1,5 +1,146 @@
 [
   {
+    "id": "1745891400000",
+    "analysed_at": "2026-04-29T00:30:00.000Z",
+    "analysis_type": "purchase",
+    "listing": {
+      "address": "31 Rosedale Avenue",
+      "suburb": "Penrith",
+      "state": "NSW",
+      "postcode": "2750",
+      "type": "House",
+      "purpose": "investment",
+      "url": "https://www.realestate.com.au/property-house-nsw-penrith-150862172",
+      "asking_price": 1175000,
+      "bedrooms": 3,
+      "bathrooms": 1,
+      "car_spaces": 1,
+      "land_size_sqm": null,
+      "floor_size_sqm": null,
+      "days_on_market": null,
+      "description_summary": "Three-bedroom brick house in Penrith zoned R3 Medium Density, offering development upside subject to council approval. Features zoned ducted air conditioning, mirrored built-in wardrobes, undercover patio and backyard. Walking distance to Penrith South Public School, local shops, and minutes from Penrith Station and Westfield Penrith."
+    },
+    "valuation": {
+      "estimated_value": 1050000,
+      "comparable_range_low": 980000,
+      "comparable_range_high": 1120000,
+      "price_gap_pct": 11.9,
+      "price_assessment": "overpriced",
+      "suburb_trend": "Rising",
+      "confidence": "Medium",
+      "reasoning": "Penrith median house price sits around $870,000–$950,000 in early 2026 for standard 3-bedroom stock. The $1,150,000–$1,200,000 asking range carries a meaningful premium above comparable 3-bed/1-bath homes in the suburb. The R3 Medium Density zoning is the key differentiator — it opens the possibility of duplex or multi-unit development on the site, which justifies a land value uplift of roughly $100,000–$150,000 over a purely residential R2 block. Factoring that in, an estimated value of $1,050,000 reflects realistic development-aware pricing; the vendor is seeking the top of that range. Western Sydney Airport (Badgerys Creek) is on track to open in 2026 and is expected to support continued price growth across the Greater Penrith corridor, which may close the gap over 12–24 months."
+    },
+    "rental": {
+      "estimated_weekly_rent": 560,
+      "annual_gross_income": 29120,
+      "annual_net_income": 17545,
+      "gross_yield_pct": 2.48,
+      "net_yield_pct": 1.49,
+      "vacancy_rate_suburb_pct": 1.8,
+      "annual_expenses": {
+        "property_management": 2475,
+        "council_rates": 2200,
+        "insurance": 1900,
+        "maintenance_allowance": 5000,
+        "strata_fees": 0
+      }
+    },
+    "financing": {
+      "stamp_duty_estimate": 49090,
+      "upfront_costs_estimate": 63000,
+      "suggested_deposit_pct": 20,
+      "loan_amount_at_20pct_deposit": 940000,
+      "monthly_repayment_estimate_5pct": 5045,
+      "monthly_repayment_estimate_6pct": 5636,
+      "monthly_repayment_estimate_7pct": 6253
+    },
+    "due_diligence": {
+      "red_flags": [
+        {
+          "flag": "Single bathroom for a 3-bedroom house will limit tenant appeal and resale to families expecting at least 2 bathrooms — constrains both rental demand and future buyer pool.",
+          "severity": "medium"
+        },
+        {
+          "flag": "Asking price is approximately 12% above estimated market value for like-for-like 3-bed/1-bath stock; the R3 premium is only realised if a DA is approved and construction is viable.",
+          "severity": "high"
+        },
+        {
+          "flag": "Gross yield of ~2.5% produces strong negative gearing — at a 6% loan rate, interest alone exceeds $56,000/year against ~$29,000 gross rent, requiring ~$27,000+ annual top-up from the investor.",
+          "severity": "high"
+        },
+        {
+          "flag": "R3 zoning development potential is subject to Penrith City Council DA approval, minimum lot sizes, and setback requirements — confirm land area and frontage before pricing in development value.",
+          "severity": "medium"
+        },
+        {
+          "flag": "Land size not disclosed in listing — essential to assess whether a duplex or dual-occupancy is actually achievable under Council LEP.",
+          "severity": "medium"
+        }
+      ],
+      "days_on_market_flag": false,
+      "checklist": [
+        {
+          "item": "Obtain full land size and frontage measurements from Section 10.7 Planning Certificate or title search.",
+          "priority": "high"
+        },
+        {
+          "item": "Confirm R3 zoning allows duplex/dual-occupancy on the specific lot size with Penrith City Council (LEP 2010 cl. 4.1B).",
+          "priority": "high"
+        },
+        {
+          "item": "Commission independent pest and building inspection — single bathroom suggests original fitout which may have deferred maintenance.",
+          "priority": "high"
+        },
+        {
+          "item": "Obtain comparable sales from last 6 months within 1km (target 3-bed/1-bath on similar land size) to justify offer price.",
+          "priority": "high"
+        },
+        {
+          "item": "Model the development scenario: get a preliminary development feasibility (duplex) to determine whether the R3 premium in the asking price is actually recoverable.",
+          "priority": "high"
+        },
+        {
+          "item": "Check flood overlay — parts of Penrith (particularly areas near the Nepean River) carry flood risk; confirm on Penrith City Council flood maps.",
+          "priority": "medium"
+        },
+        {
+          "item": "Negotiate below asking — the $1,150,000–$1,200,000 range implies vendor is testing the market; comparables support an offer closer to $1,050,000–$1,080,000.",
+          "priority": "medium"
+        },
+        {
+          "item": "Verify ducted A/C age and service history — zoned ducted systems are costly to replace ($10,000–$20,000).",
+          "priority": "low"
+        },
+        {
+          "item": "Check NBN connection type for the address (Penrith has mixed FTTC/FTTN coverage).",
+          "priority": "low"
+        }
+      ]
+    },
+    "location": {
+      "flood_risk": "Medium",
+      "bushfire_risk": "Low",
+      "schools_nearby": "Penrith South Public School is walking distance. Penrith High School and Trinity Catholic College are within 2 km. Western Sydney University (Penrith/Kingswood campus) is approximately 3 km away.",
+      "transport_access": "Penrith Station (T1 Western Line to Sydney CBD ~55 min) is approximately 1.5 km away. Kingswood Station is also nearby. M4 Motorway access provides road connectivity east toward Parramatta and Sydney. Bus services operate on surrounding arterials.",
+      "amenities": "Westfield Penrith (major retail/dining) within 2 km. Nepean Village shopping centre nearby. Nepean Hospital adjacent to the suburb corridor. East Bank dining precinct along the Nepean River. Stafford Street local shops walkable.",
+      "growth_drivers": [
+        "Western Sydney International Airport (Nancy-Bird Walton Airport) opening 2026 — expected to create 28,000+ jobs and drive sustained demand across Greater Penrith",
+        "Aerotropolis / Western Parkland City infrastructure investment including rail link planning and commercial precinct development",
+        "NSW Government investment in Penrith health and education precinct (Nepean Hospital expansion)",
+        "Penrith emerging as a regional CBD hub with sustained population growth in Western Sydney",
+        "R3 zoning — development optionality as the suburb densifies over the next decade"
+      ]
+    },
+    "score": {
+      "overall": 5,
+      "value": 4,
+      "yield": 3,
+      "location": 7,
+      "risk": 6,
+      "verdict": "31 Rosedale Avenue is a location play rather than a yield play. The Western Sydney Airport opening in 2026 is a genuine structural tailwind for Penrith property values, and R3 zoning gives this site optionality that a standard residential block lacks. However, at the $1,150,000–$1,200,000 asking range the numbers are challenging: gross yield barely reaches 2.5%, negative gearing will cost the investor $27,000+ per year at current rates, and the asking price sits roughly 12% above what comparable unrenovated 3-bed/1-bath stock is currently achieving. The single bathroom is a meaningful constraint on both tenant demand and resale liquidity. This property suits a buyer who (a) has confirmed the R3 development is viable on the actual lot size, (b) can hold for 5–7 years through the airport-driven growth cycle, and (c) has the cash flow to sustain negative gearing. Buyers looking for immediate income return or a sub-$1.1M entry point should look elsewhere in the suburb. Negotiate hard — the evidence does not support the premium end of the range."
+    }
+  },
+  {
     "id": "1746057600000",
     "analysed_at": "2026-04-29T00:30:00.000Z",
     "analysis_type": "rental",
