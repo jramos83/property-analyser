@@ -1405,13 +1405,31 @@ async function githubSave(props) {
 }
 
 // ── GitHub sync settings modal ───────────────────────────────────────────────
-function SyncSettingsModal({ onClose }) {
+function SyncSettingsModal({ onClose, onSyncNow }) {
   const [pat, setPat] = React.useState(localStorage.getItem(PAT_KEY) || '');
+  const [pushStatus, setPushStatus] = React.useState('idle'); // 'idle'|'pushing'|'ok'|'error'
+  const [pushError, setPushError] = React.useState('');
+
   const save = () => {
     if (pat.trim()) localStorage.setItem(PAT_KEY, pat.trim());
     else localStorage.removeItem(PAT_KEY);
     onClose();
   };
+
+  const handleSyncNow = async () => {
+    if (pat.trim()) localStorage.setItem(PAT_KEY, pat.trim());
+    setPushStatus('pushing');
+    setPushError('');
+    try {
+      const result = await onSyncNow();
+      if (result === 'no-pat') { setPushStatus('error'); setPushError('No token saved.'); return; }
+      setPushStatus('ok');
+    } catch (e) {
+      setPushStatus('error');
+      setPushError(e.message);
+    }
+  };
+
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal" style={{maxWidth:500}}>
@@ -1434,12 +1452,17 @@ function SyncSettingsModal({ onClose }) {
             placeholder="github_pat_..."
             autoFocus
           />
+          {pushStatus === 'ok' && <p style={{color:'var(--green)',marginTop:10,fontSize:13}}>✓ Pushed successfully — reload other devices to see changes.</p>}
+          {pushStatus === 'error' && <p style={{color:'var(--red)',marginTop:10,fontSize:13}}>⚠ {pushError || 'Push failed.'}</p>}
         </div>
         <div className="modal-footer">
           {localStorage.getItem(PAT_KEY) && (
             <button className="btn btn-danger btn-sm" onClick={() => { localStorage.removeItem(PAT_KEY); onClose(); }}>Clear token</button>
           )}
           <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
+          <button className="btn btn-secondary" onClick={handleSyncNow} disabled={pushStatus === 'pushing'}>
+            {pushStatus === 'pushing' ? '↻ Pushing…' : '☁ Push now'}
+          </button>
           <button className="btn btn-primary" onClick={save}>Save</button>
         </div>
       </div>
@@ -1617,7 +1640,7 @@ function App() {
       </main>
 
       {showAddModal && <AddPropertyModal onClose={() => setShowAddModal(false)} onAdd={handleAdd} />}
-      {showSyncModal && <SyncSettingsModal onClose={() => setShowSyncModal(false)} />}
+      {showSyncModal && <SyncSettingsModal onClose={() => setShowSyncModal(false)} onSyncNow={() => githubSave(properties)} />}
     </div>
   );
 }
