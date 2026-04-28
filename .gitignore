@@ -1,0 +1,6 @@
+proxy.js
+proxy.py
+proxy.log
+proxy_debug.txt
+_*.json
+.claude/

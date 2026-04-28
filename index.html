@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Property Analyser</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3250;
+      --text: #e8eaf0;
+      --muted: #7b82a0;
+      --accent: #4f7cff;
+      --accent2: #7c5cff;
+      --green: #22c55e;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --green-bg: rgba(34,197,94,0.12);
+      --amber-bg: rgba(245,158,11,0.12);
+      --red-bg: rgba(239,68,68,0.12);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── Layout ── */
+    .app { display: flex; flex-direction: column; min-height: 100vh; }
+    .nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; height: 60px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; }
+    .nav-logo { font-size: 18px; font-weight: 700; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; flex: 1; }
+    .main { flex: 1; padding: 28px 24px; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+    /* ── Buttons ── */
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: var(--radius-sm); border: none; cursor: pointer; font-size: 14px; font-weight: 600; transition: all .15s; white-space: nowrap; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #3d6aff; }
+    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-danger { background: var(--red-bg); color: var(--red); border: 1px solid rgba(239,68,68,.3); }
+    .btn-danger:hover { background: rgba(239,68,68,.25); }
+    .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+    .btn-sm { padding: 6px 12px; font-size: 13px; }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* ── Cards ── */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+
+    /* ── Score badge ── */
+    .score-badge { display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 800; }
+    .score-badge.sm { width: 38px; height: 38px; font-size: 14px; }
+    .score-badge.lg { width: 72px; height: 72px; font-size: 26px; }
+    .score-green { background: var(--green-bg); color: var(--green); border: 2px solid var(--green); }
+    .score-amber { background: var(--amber-bg); color: var(--amber); border: 2px solid var(--amber); }
+    .score-red { background: var(--red-bg); color: var(--red); border: 2px solid var(--red); }
+
+    /* ── Pills ── */
+    .pill { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; text-transform: capitalize; }
+    .pill-green { background: var(--green-bg); color: var(--green); }
+    .pill-amber { background: var(--amber-bg); color: var(--amber); }
+    .pill-red { background: var(--red-bg); color: var(--red); }
+    .pill-gray { background: rgba(123,130,160,.15); color: var(--muted); }
+    .pill-blue { background: rgba(79,124,255,.15); color: var(--accent); }
+
+    /* ── Home grid ── */
+    .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+    .toolbar-left { display: flex; align-items: center; gap: 10px; flex: 1; flex-wrap: wrap; }
+    .sort-select { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: var(--radius-sm); font-size: 14px; cursor: pointer; }
+    .property-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+
+    .prop-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; cursor: pointer; transition: border-color .2s, transform .15s; position: relative; }
+    .prop-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .prop-card.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(79,124,255,.3); }
+    .prop-card-checkbox { position: absolute; top: 12px; left: 12px; z-index: 2; width: 20px; height: 20px; accent-color: var(--accent); cursor: pointer; }
+    .prop-img { width: 100%; height: 180px; background: linear-gradient(135deg, var(--surface2) 0%, #1e2236 100%); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 13px; position: relative; }
+    .prop-img-icon { font-size: 48px; opacity: .3; }
+    .prop-card-body { padding: 16px; }
+    .prop-address { font-weight: 700; font-size: 15px; margin-bottom: 4px; line-height: 1.3; }
+    .prop-suburb { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+    .prop-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .prop-metric { background: var(--surface2); border-radius: var(--radius-sm); padding: 8px 10px; }
+    .prop-metric-label { font-size: 11px; color: var(--muted); margin-bottom: 2px; text-transform: uppercase; letter-spacing: .5px; }
+    .prop-metric-value { font-size: 15px; font-weight: 700; }
+    .prop-card-footer { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .prop-score-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+
+    /* ── Empty state ── */
+    .empty { text-align: center; padding: 80px 20px; }
+    .empty-icon { font-size: 64px; margin-bottom: 20px; opacity: .4; }
+    .empty h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .empty p { color: var(--muted); margin-bottom: 24px; }
+
+    /* ── Modal ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 680px; max-height: 90vh; display: flex; flex-direction: column; }
+    .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .modal-title { font-size: 18px; font-weight: 700; }
+    .modal-close { background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; line-height: 1; padding: 4px 8px; border-radius: 6px; }
+    .modal-close:hover { background: var(--surface2); color: var(--text); }
+    .modal-body { padding: 24px; flex: 1; overflow-y: auto; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+    .json-textarea { width: 100%; height: 300px; background: #0a0c14; border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-family: 'Courier New', monospace; font-size: 13px; padding: 14px; resize: vertical; line-height: 1.5; }
+    .json-textarea:focus { outline: none; border-color: var(--accent); }
+    .error-msg { margin-top: 10px; padding: 10px 14px; background: var(--red-bg); border: 1px solid rgba(239,68,68,.3); border-radius: var(--radius-sm); color: var(--red); font-size: 13px; }
+    .hint { margin-bottom: 12px; color: var(--muted); font-size: 13px; }
+
+    /* ── Report ── */
+    .report-header { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 28px; flex-wrap: wrap; }
+    .report-header-info { flex: 1; min-width: 240px; }
+    .report-address { font-size: 24px; font-weight: 800; margin-bottom: 6px; line-height: 1.2; }
+    .report-suburb { color: var(--muted); font-size: 15px; margin-bottom: 12px; }
+    .report-verdict { font-size: 15px; color: var(--text); line-height: 1.5; background: var(--surface2); padding: 12px 16px; border-radius: var(--radius-sm); border-left: 3px solid var(--accent); }
+    .report-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+    .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 28px; }
+    .metric-tile { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+    .metric-tile-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; }
+    .metric-tile-value { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+    .metric-tile-sub { font-size: 12px; color: var(--muted); }
+
+    .score-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 28px; }
+    .score-tile { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; text-align: center; }
+    .score-tile-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+    .score-bar-wrap { height: 6px; background: var(--surface2); border-radius: 99px; margin-top: 6px; }
+    .score-bar { height: 6px; border-radius: 99px; transition: width .5s; }
+
+    /* ── Sections ── */
+    .section { margin-bottom: 16px; }
+    .section-toggle { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; text-align: left; color: var(--text); font-size: 15px; font-weight: 700; transition: border-color .2s; }
+    .section-toggle:hover { border-color: var(--accent); }
+    .section-toggle.open { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom-color: transparent; }
+    .section-body { background: var(--surface); border: 1px solid var(--border); border-top: none; border-bottom-left-radius: var(--radius); border-bottom-right-radius: var(--radius); padding: 20px; }
+    .chevron { transition: transform .2s; color: var(--muted); }
+    .chevron.open { transform: rotate(180deg); }
+
+    /* ── Tables ── */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .data-table th { text-align: left; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .6px; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+    .data-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table .total-row td { font-weight: 700; color: var(--green); border-top: 1px solid var(--border); }
+
+    /* ── Red flags ── */
+    .flags-list { display: flex; flex-direction: column; gap: 8px; }
+    .flag-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; border-radius: var(--radius-sm); }
+    .flag-high { background: var(--red-bg); border: 1px solid rgba(239,68,68,.3); }
+    .flag-medium { background: var(--amber-bg); border: 1px solid rgba(245,158,11,.3); }
+    .flag-low { background: rgba(123,130,160,.1); border: 1px solid var(--border); }
+    .flag-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+    .flag-dot-high { background: var(--red); }
+    .flag-dot-medium { background: var(--amber); }
+    .flag-dot-low { background: var(--muted); }
+    .flag-text { flex: 1; font-size: 14px; line-height: 1.4; }
+    .flag-severity { font-size: 11px; font-weight: 700; text-transform: uppercase; margin-left: auto; padding: 2px 8px; border-radius: 99px; }
+    .flag-severity-high { color: var(--red); }
+    .flag-severity-medium { color: var(--amber); }
+    .flag-severity-low { color: var(--muted); }
+
+    /* ── Checklist ── */
+    .checklist-group { margin-bottom: 16px; }
+    .checklist-group-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); margin-bottom: 8px; }
+    .checklist-item { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .checklist-item:last-child { border-bottom: none; }
+    .check-icon { color: var(--muted); flex-shrink: 0; margin-top: 1px; }
+
+    /* ── Location ── */
+    .risk-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .location-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .location-item { background: var(--surface2); border-radius: var(--radius-sm); padding: 12px; }
+    .location-item-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+    .location-item-value { font-size: 14px; line-height: 1.4; }
+
+    /* ── Financing ── */
+    .repayment-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+    .repayment-card { background: var(--surface2); border-radius: var(--radius-sm); padding: 14px; text-align: center; }
+    .repayment-rate { font-size: 20px; font-weight: 800; color: var(--accent); margin-bottom: 4px; }
+    .repayment-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    .repayment-amount { font-size: 15px; font-weight: 700; margin-top: 4px; }
+
+    /* ── Comparison ── */
+    .compare-table-wrap { overflow-x: auto; }
+    .compare-table { min-width: 700px; width: 100%; border-collapse: collapse; font-size: 14px; }
+    .compare-table th { background: var(--surface2); padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
+    .compare-table th.prop-col { text-align: center; font-size: 13px; color: var(--text); }
+    .compare-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .compare-table td.prop-col { text-align: center; }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table .row-label { color: var(--muted); font-size: 13px; font-weight: 600; white-space: nowrap; }
+    .best-val { background: rgba(34,197,94,.08) !important; }
+    .compare-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+
+    /* ── Valuation ── */
+    .val-range { display: flex; align-items: center; gap: 12px; margin: 12px 0; flex-wrap: wrap; }
+    .val-range-item { text-align: center; }
+    .val-range-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .val-range-value { font-size: 16px; font-weight: 700; }
+    .val-range-bar { flex: 1; height: 8px; background: var(--surface2); border-radius: 99px; position: relative; min-width: 80px; }
+    .val-range-fill { position: absolute; left: 0; top: 0; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--green), var(--accent)); }
+    .val-range-dot { position: absolute; top: -4px; width: 16px; height: 16px; border-radius: 50%; background: var(--amber); border: 2px solid var(--bg); transform: translateX(-50%); }
+    .reasoning-box { background: var(--surface2); border-radius: var(--radius-sm); padding: 14px; font-size: 14px; line-height: 1.6; color: var(--text); margin-top: 12px; }
+
+    /* ── Back button ── */
+    .back-btn { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 14px; cursor: pointer; margin-bottom: 20px; background: none; border: none; padding: 4px 0; }
+    .back-btn:hover { color: var(--text); }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .main { padding: 16px; }
+      .metrics-row { grid-template-columns: repeat(2, 1fr); }
+      .repayment-grid { grid-template-columns: 1fr; }
+      .location-grid { grid-template-columns: 1fr; }
+      .report-address { font-size: 20px; }
+      .score-row { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* ── Analyse modal ── */
+    .analyse-textarea { width: 100%; height: 260px; background: #0a0c14; border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; padding: 14px; resize: vertical; line-height: 1.5; }
+    .analyse-textarea:focus { outline: none; border-color: var(--accent); }
+    .analyse-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; gap: 16px; }
+    .spinner { width: 44px; height: 44px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .analyse-loading-text { color: var(--muted); font-size: 14px; text-align: center; line-height: 1.5; }
+    .analyse-step { font-size: 12px; color: var(--accent); margin-top: 4px; }
+
+    /* ── Mode toggle (Buy / Rent) ── */
+    .mode-toggle { display: flex; background: var(--surface2); border-radius: var(--radius-sm); padding: 3px; gap: 3px; margin-bottom: 16px; }
+    .mode-tab { flex: 1; padding: 8px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .15s; background: transparent; color: var(--muted); }
+    .mode-tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,.3); }
+    .mode-tab-buy.active { color: var(--accent); }
+    .mode-tab-rent.active { color: var(--green); }
+
+    /* ── Rental badge on cards ── */
+    .rental-badge { position: absolute; top: 10px; right: 10px; background: rgba(34,197,94,.15); color: var(--green); border: 1px solid rgba(34,197,94,.4); border-radius: 99px; font-size: 11px; font-weight: 700; padding: 2px 8px; }
+
+    /* ── Filter tabs (All / Buy / Rent) ── */
+    .filter-tabs { display: flex; gap: 4px; }
+    .filter-tab { padding: 6px 14px; border-radius: 99px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; }
+    .filter-tab.active { background: var(--surface2); color: var(--text); border-color: var(--accent); }
+
+    /* ── Rent assessment pill ── */
+    .pill-below { background: rgba(34,197,94,.15); color: var(--green); }
+    .pill-above { background: var(--red-bg); color: var(--red); }
+
+    /* ── realestate.com.au branded button ── */
+    .btn-rea {
+      display: inline-flex; align-items: center; gap: 0;
+      padding: 6px 14px 6px 10px;
+      background: #e8002d; border-radius: 6px; border: none;
+      text-decoration: none; cursor: pointer;
+      font-size: 13px; font-weight: 800; line-height: 1;
+      color: #fff; white-space: nowrap;
+      transition: background .15s, transform .1s;
+    }
+    .btn-rea:hover { background: #c4001f; transform: translateY(-1px); }
+    .btn-rea-house { font-size: 15px; margin-right: 6px; }
+    .btn-rea-text { font-weight: 800; letter-spacing: -.3px; }
+    .btn-rea-domain { font-weight: 400; opacity: .85; }
+
+    /* ── Utility ── */
+    .flex { display: flex; }
+    .gap-8 { gap: 8px; }
+    .gap-12 { gap: 12px; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .text-muted { color: var(--muted); }
+    .text-sm { font-size: 13px; }
+    .text-green { color: var(--green); }
+    .text-amber { color: var(--amber); }
+    .text-red { color: var(--red); }
+    .font-bold { font-weight: 700; }
+    .mb-8 { margin-bottom: 8px; }
+    .mb-12 { margin-bottom: 12px; }
+    .mb-16 { margin-bottom: 16px; }
+    .mb-20 { margin-bottom: 20px; }
+    .mt-4 { margin-top: 4px; }
+    .w-full { width: 100%; }
+    .divider { height: 1px; background: var(--border); margin: 16px 0; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: var(--muted); }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useCallback, useRef } = React;
+
+// ── Formatting helpers ──────────────────────────────────────────────────────
+const aud = (v) => new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 }).format(v || 0);
+const pct = (v) => `${(+v || 0).toFixed(2)}%`;
+const num = (v, d = 0) => new Intl.NumberFormat('en-AU', { maximumFractionDigits: d }).format(v || 0);
+
+// ── Score helpers ───────────────────────────────────────────────────────────
+const scoreClass = (s) => s >= 7 ? 'score-green' : s >= 4 ? 'score-amber' : 'score-red';
+const scoreColor = (s) => s >= 7 ? 'var(--green)' : s >= 4 ? 'var(--amber)' : 'var(--red)';
+
+function ScoreBadge({ score, size = 'sm' }) {
+  return (
+    <span className={`score-badge ${size} ${scoreClass(score)}`}>{score}</span>
+  );
+}
+
+// ── Price assessment pill ───────────────────────────────────────────────────
+function AssessmentPill({ value }) {
+  if (!value) return null;
+  const v = value.toLowerCase();
+  const cls = v.includes('under') ? 'pill-green' : v.includes('fair') ? 'pill-gray' : 'pill-red';
+  return <span className={`pill ${cls}`}>{value}</span>;
+}
+
+// ── Risk pill ───────────────────────────────────────────────────────────────
+function RiskPill({ label, value }) {
+  if (!value) return null;
+  const v = (value || '').toLowerCase();
+  const cls = v.includes('low') ? 'pill-green' : v.includes('medium') || v.includes('moderate') ? 'pill-amber' : 'pill-red';
+  return <span className={`pill ${cls}`}>{label}: {value}</span>;
+}
+
+// ── localStorage helpers ────────────────────────────────────────────────────
+const STORAGE_KEY = 'property_analyses';
+const loadProperties = () => {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+};
+const saveProperties = (props) => localStorage.setItem(STORAGE_KEY, JSON.stringify(props));
+
+// Merge two property arrays — b wins on duplicate id
+const mergeProps = (a, b) => {
+  const map = new Map(a.map(p => [p.id, p]));
+  b.forEach(p => map.set(p.id, p));
+  return [...map.values()];
+};
+
+// ── JSON Validation ─────────────────────────────────────────────────────────
+function validateProperty(data) {
+  if (!data || typeof data !== 'object') throw new Error('JSON must be an object');
+  if (!data.listing) throw new Error('Missing "listing" field');
+  if (!data.listing.address) throw new Error('Missing listing.address');
+  if (!data.score) throw new Error('Missing "score" field');
+  if (data.analysis_type === 'rental' && !data.rent_assessment) throw new Error('Missing "rent_assessment" field for rental analysis');
+  return true;
+}
+
+// ── Add Property Modal ──────────────────────────────────────────────────────
+function AddPropertyModal({ onClose, onAdd }) {
+  const [json, setJson] = useState('');
+  const [error, setError] = useState('');
+
+  const handleAdd = () => {
+    setError('');
+    try {
+      const data = JSON.parse(json);
+      validateProperty(data);
+      if (!data.id) data.id = Date.now().toString();
+      if (!data.analysed_at) data.analysed_at = new Date().toISOString();
+      onAdd(data);
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal">
+        <div className="modal-header">
+          <span className="modal-title">Add Property Analysis</span>
+          <button className="modal-close" onClick={onClose}>×</button>
+        </div>
+        <div className="modal-body">
+          <p className="hint">Paste the JSON output from your Claude property analysis below.</p>
+          <textarea
+            className="json-textarea"
+            value={json}
+            onChange={(e) => setJson(e.target.value)}
+            placeholder='{ "id": "...", "listing": { ... }, "score": { ... }, ... }'
+            spellCheck={false}
+          />
+          {error && <div className="error-msg">⚠ {error}</div>}
+        </div>
+        <div className="modal-footer">
+          <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
+          <button className="btn btn-primary" onClick={handleAdd} disabled={!json.trim()}>Import Analysis</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+// ── Property Card (home grid) ───────────────────────────────────────────────
+function PropertyCard({ property: p, selected, onSelect, onClick }) {
+  const { listing: l = {}, score = {}, valuation: v = {}, rental: r = {}, rent_assessment: ra = {} } = p;
+  const isRental = p.analysis_type === 'rental';
+  const redFlags = (p.due_diligence?.red_flags || []).filter(f => f.severity === 'high' || f.severity === 'medium').length;
+  const rentGap = ra.rent_gap_pct;
+  const rentGapColor = rentGap > 5 ? 'var(--red)' : rentGap < -5 ? 'var(--green)' : 'var(--text)';
+
+  return (
+    <div
+      className={`prop-card ${selected ? 'selected' : ''}`}
+      onClick={() => onClick(p)}
+    >
+      <input
+        type="checkbox"
+        className="prop-card-checkbox"
+        checked={selected}
+        onChange={(e) => { e.stopPropagation(); onSelect(p.id); }}
+        onClick={(e) => e.stopPropagation()}
+      />
+      <div className="prop-img">
+        <div className="prop-img-icon">{isRental ? '🔑' : '🏠'}</div>
+        {isRental
+          ? <span className="rental-badge">RENTAL</span>
+          : <div style={{position:'absolute',bottom:10,right:10}}><AssessmentPill value={v.price_assessment} /></div>
+        }
+      </div>
+      <div className="prop-card-body">
+        <div className="prop-score-row">
+          <ScoreBadge score={score.overall} size="sm" />
+          <div>
+            <div className="prop-address">{l.address || 'Unknown address'}</div>
+            <div className="prop-suburb">{[l.suburb, l.state, l.postcode].filter(Boolean).join(' ')}</div>
+          </div>
+        </div>
+        {isRental ? (
+          <div className="prop-metrics">
+            <div className="prop-metric">
+              <div className="prop-metric-label">Weekly Rent</div>
+              <div className="prop-metric-value">{aud(l.asking_rent_weekly)}</div>
+            </div>
+            <div className="prop-metric">
+              <div className="prop-metric-label">Fair Rent</div>
+              <div className="prop-metric-value" style={{color:'var(--green)'}}>{aud(ra.fair_weekly_rent)}</div>
+            </div>
+            <div className="prop-metric">
+              <div className="prop-metric-label">vs Market</div>
+              <div className="prop-metric-value" style={{color: rentGapColor}}>
+                {rentGap != null ? `${rentGap > 0 ? '+' : ''}${(+rentGap).toFixed(1)}%` : '—'}
+              </div>
+            </div>
+            <div className="prop-metric">
+              <div className="prop-metric-label">$/Bedroom</div>
+              <div className="prop-metric-value">{aud(p.affordability?.value_per_bedroom_weekly)}</div>
+            </div>
+          </div>
+        ) : (
+          <div className="prop-metrics">
+            <div className="prop-metric">
+              <div className="prop-metric-label">Asking Price</div>
+              <div className="prop-metric-value">{aud(l.asking_price)}</div>
+            </div>
+            <div className="prop-metric">
+              <div className="prop-metric-label">Gross Yield</div>
+              <div className="prop-metric-value" style={{color:'var(--green)'}}>{pct(r.gross_yield_pct)}</div>
+            </div>
+            <div className="prop-metric">
+              <div className="prop-metric-label">Est. Value</div>
+              <div className="prop-metric-value">{aud(v.estimated_value)}</div>
+            </div>
+            <div className="prop-metric">
+              <div className="prop-metric-label">Weekly Rent</div>
+              <div className="prop-metric-value">{aud(r.estimated_weekly_rent)}</div>
+            </div>
+          </div>
+        )}
+        <div className="prop-card-footer">
+          {l.type && <span className="pill pill-blue">{l.type}</span>}
+          {l.bedrooms && <span className="pill pill-gray">🛏 {l.bedrooms}</span>}
+          {l.bathrooms && <span className="pill pill-gray">🚿 {l.bathrooms}</span>}
+          {redFlags > 0 && <span className="pill pill-red">⚠ {redFlags} flag{redFlags !== 1 ? 's' : ''}</span>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Section (collapsible) ───────────────────────────────────────────────────
+function Section({ title, icon, children, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="section">
+      <button className={`section-toggle ${open ? 'open' : ''}`} onClick={() => setOpen(o => !o)}>
+        <span>{icon} {title}</span>
+        <span className={`chevron ${open ? 'open' : ''}`}>▼</span>
+      </button>
+      {open && <div className="section-body">{children}</div>}
+    </div>
+  );
+}
+
+// ── Valuation Section ───────────────────────────────────────────────────────
+function ValuationSection({ valuation: v = {}, listing: l = {} }) {
+  const low = v.comparable_range_low || 0;
+  const high = v.comparable_range_high || 1;
+  const price = l.asking_price || 0;
+  const est = v.estimated_value || 0;
+  const range = high - low;
+  const pricePct = range > 0 ? Math.max(0, Math.min(100, ((price - low) / range) * 100)) : 50;
+  const estPct = range > 0 ? Math.max(0, Math.min(100, ((est - low) / range) * 100)) : 50;
+
+  return (
+    <>
+      <div className="two-col mb-12">
+        <div className="info-row" style={{display:'flex',flexDirection:'column',gap:4,background:'var(--surface2)',padding:12,borderRadius:8,border:'none'}}>
+          <span className="info-label text-sm">Estimated Value</span>
+          <span style={{fontSize:22,fontWeight:800,color:'var(--green)'}}>{aud(est)}</span>
+        </div>
+        <div style={{background:'var(--surface2)',padding:12,borderRadius:8}}>
+          <div className="text-sm text-muted mb-8">Suburb Trend</div>
+          <div className="font-bold">{v.suburb_trend || '—'}</div>
+          <div className="text-sm text-muted mt-4">Confidence: {v.confidence || '—'}</div>
+        </div>
+      </div>
+
+      <div className="text-sm text-muted mb-8">Comparable Range</div>
+      <div className="val-range">
+        <div className="val-range-item">
+          <div className="val-range-label">Low</div>
+          <div className="val-range-value">{aud(low)}</div>
+        </div>
+        <div className="val-range-bar" style={{flex:1}}>
+          <div className="val-range-fill" style={{width:'100%'}}></div>
+          <div className="val-range-dot" style={{left:`${estPct}%`, background:'var(--green)'}} title={`Est: ${aud(est)}`}></div>
+          <div className="val-range-dot" style={{left:`${pricePct}%`, background:'var(--amber)', top:'-4px'}} title={`Ask: ${aud(price)}`}></div>
+        </div>
+        <div className="val-range-item" style={{textAlign:'right'}}>
+          <div className="val-range-label">High</div>
+          <div className="val-range-value">{aud(high)}</div>
+        </div>
+      </div>
+      <div className="flex gap-8 mb-12" style={{fontSize:12,color:'var(--muted)'}}>
+        <span>🟢 Estimated value</span><span>🟡 Asking price</span>
+      </div>
+      {v.reasoning && <div className="reasoning-box">{v.reasoning}</div>}
+    </>
+  );
+}
+
+// ── Rental Section ──────────────────────────────────────────────────────────
+function RentalSection({ rental: r = {} }) {
+  const exp = r.annual_expenses || {};
+  const totalExp = Object.values(exp).reduce((s, v) => s + (v || 0), 0);
+  return (
+    <>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))',gap:10,marginBottom:16}}>
+        {[
+          {label:'Weekly Rent', value: aud(r.estimated_weekly_rent)},
+          {label:'Gross Yield', value: pct(r.gross_yield_pct), color:'var(--green)'},
+          {label:'Net Yield', value: pct(r.net_yield_pct), color:'var(--green)'},
+          {label:'Vacancy Rate', value: pct(r.vacancy_rate_suburb_pct)},
+        ].map(m => (
+          <div key={m.label} style={{background:'var(--surface2)',borderRadius:8,padding:'10px 12px'}}>
+            <div className="text-sm text-muted mb-8">{m.label}</div>
+            <div style={{fontWeight:800,fontSize:17,color:m.color||'var(--text)'}}>{m.value}</div>
+          </div>
+        ))}
+      </div>
+      <table className="data-table">
+        <thead><tr><th>Item</th><th style={{textAlign:'right'}}>Annual</th></tr></thead>
+        <tbody>
+          <tr><td className="font-bold">Gross Income</td><td style={{textAlign:'right',color:'var(--green)',fontWeight:700}}>{aud(r.annual_gross_income)}</td></tr>
+          {exp.property_management > 0 && <tr><td className="text-muted">Property Management</td><td style={{textAlign:'right',color:'var(--red)'}}>−{aud(exp.property_management)}</td></tr>}
+          {exp.council_rates > 0 && <tr><td className="text-muted">Council Rates</td><td style={{textAlign:'right',color:'var(--red)'}}>−{aud(exp.council_rates)}</td></tr>}
+          {exp.insurance > 0 && <tr><td className="text-muted">Insurance</td><td style={{textAlign:'right',color:'var(--red)'}}>−{aud(exp.insurance)}</td></tr>}
+          {exp.maintenance_allowance > 0 && <tr><td className="text-muted">Maintenance</td><td style={{textAlign:'right',color:'var(--red)'}}>−{aud(exp.maintenance_allowance)}</td></tr>}
+          {exp.strata_fees > 0 && <tr><td className="text-muted">Strata Fees</td><td style={{textAlign:'right',color:'var(--red)'}}>−{aud(exp.strata_fees)}</td></tr>}
+          <tr><td className="text-muted">Total Expenses</td><td style={{textAlign:'right',color:'var(--red)',fontWeight:700}}>−{aud(totalExp)}</td></tr>
+          <tr className="total-row"><td>Net Income</td><td style={{textAlign:'right'}}>{aud(r.annual_net_income)}</td></tr>
+        </tbody>
+      </table>
+    </>
+  );
+}
+
+// ── Financing Section ───────────────────────────────────────────────────────
+function FinancingSection({ financing: f = {} }) {
+  return (
+    <>
+      <div style={{marginBottom:16}}>
+        {[
+          {label:'Stamp Duty Estimate', value: aud(f.stamp_duty_estimate)},
+          {label:'Total Upfront Costs', value: aud(f.upfront_costs_estimate)},
+          {label:'Suggested Deposit', value: `${f.suggested_deposit_pct}%`},
+          {label:'Loan Amount (20% dep.)', value: aud(f.loan_amount_at_20pct_deposit)},
+        ].map(r => (
+          <div key={r.label} className="info-row">
+            <span className="info-label">{r.label}</span>
+            <span className="font-bold">{r.value}</span>
+          </div>
+        ))}
+      </div>
+      <div className="text-sm text-muted mb-8">Monthly Repayments (P&amp;I, 30 yr)</div>
+      <div className="repayment-grid">
+        {[
+          {rate:'5%', amount: f.monthly_repayment_estimate_5pct},
+          {rate:'6%', amount: f.monthly_repayment_estimate_6pct},
+          {rate:'7%', amount: f.monthly_repayment_estimate_7pct},
+        ].map(r => (
+          <div key={r.rate} className="repayment-card">
+            <div className="repayment-rate">{r.rate}</div>
+            <div className="repayment-label">Interest Rate</div>
+            <div className="repayment-amount">{aud(r.amount)}/mo</div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+// ── Due Diligence Section ───────────────────────────────────────────────────
+function DueDiligenceSection({ due_diligence: dd = {} }) {
+  const flags = dd.red_flags || [];
+  const checklist = dd.checklist || [];
+  const groups = checklist.reduce((acc, item) => {
+    const k = item.priority || 'other';
+    if (!acc[k]) acc[k] = [];
+    acc[k].push(item);
+    return acc;
+  }, {});
+  const priorityOrder = ['high', 'medium', 'low'];
+  const sortedGroups = Object.keys(groups).sort((a, b) => {
+    const ai = priorityOrder.indexOf(a.toLowerCase());
+    const bi = priorityOrder.indexOf(b.toLowerCase());
+    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+  });
+
+  return (
+    <>
+      {flags.length > 0 && (
+        <>
+          <div className="text-sm font-bold mb-8" style={{marginBottom:10}}>Red Flags</div>
+          <div className="flags-list mb-16" style={{marginBottom:20}}>
+            {flags.sort((a,b) => {
+              const o = {high:0,medium:1,low:2};
+              return (o[a.severity]||2) - (o[b.severity]||2);
+            }).map((f, i) => (
+              <div key={i} className={`flag-item flag-${f.severity || 'low'}`}>
+                <div className={`flag-dot flag-dot-${f.severity || 'low'}`}></div>
+                <span className="flag-text">{f.flag}</span>
+                <span className={`flag-severity flag-severity-${f.severity || 'low'}`}>{f.severity}</span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+      {flags.length === 0 && (
+        <div style={{padding:'12px 0',color:'var(--green)',marginBottom:16}}>✓ No red flags identified</div>
+      )}
+      {dd.days_on_market_flag && (
+        <div className="pill pill-amber mb-12" style={{marginBottom:12}}>⏱ Days on market flag raised</div>
+      )}
+      {sortedGroups.length > 0 && (
+        <>
+          <div className="text-sm font-bold" style={{marginBottom:10}}>Due Diligence Checklist</div>
+          {sortedGroups.map(priority => (
+            <div key={priority} className="checklist-group">
+              <div className="checklist-group-title">{priority} priority</div>
+              {groups[priority].map((item, i) => (
+                <div key={i} className="checklist-item">
+                  <span className="check-icon">☐</span>
+                  <span>{item.item}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </>
+      )}
+    </>
+  );
+}
+
+// ── Location Section ────────────────────────────────────────────────────────
+function LocationSection({ location: loc = {} }) {
+  return (
+    <>
+      <div className="risk-badges">
+        <RiskPill label="Flood Risk" value={loc.flood_risk} />
+        <RiskPill label="Bushfire Risk" value={loc.bushfire_risk} />
+      </div>
+      <div className="location-grid mb-16">
+        {loc.schools_nearby && (
+          <div className="location-item">
+            <div className="location-item-label">🎓 Schools</div>
+            <div className="location-item-value">{loc.schools_nearby}</div>
+          </div>
+        )}
+        {loc.transport_access && (
+          <div className="location-item">
+            <div className="location-item-label">🚌 Transport</div>
+            <div className="location-item-value">{loc.transport_access}</div>
+          </div>
+        )}
+        {loc.amenities && (
+          <div className="location-item" style={{gridColumn:'1 / -1'}}>
+            <div className="location-item-label">🏪 Amenities</div>
+            <div className="location-item-value">{loc.amenities}</div>
+          </div>
+        )}
+      </div>
+      {loc.growth_drivers && (
+        <>
+          <div className="text-sm font-bold mb-8">Growth Drivers</div>
+          <div className="reasoning-box">{
+            Array.isArray(loc.growth_drivers)
+              ? loc.growth_drivers.join(' • ')
+              : loc.growth_drivers
+          }</div>
+        </>
+      )}
+    </>
+  );
+}
+
+// ── Rent Assessment Section ─────────────────────────────────────────────────
+function RentAssessmentSection({ rent_assessment: ra = {}, listing: l = {} }) {
+  const gap = ra.rent_gap_pct;
+  const gapColor = gap > 5 ? 'var(--red)' : gap < -5 ? 'var(--green)' : 'var(--amber)';
+  const assessCls = ra.assessment?.includes('below') ? 'pill-below' : ra.assessment?.includes('above') ? 'pill-red' : 'pill-gray';
+  return (
+    <>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))',gap:10,marginBottom:16}}>
+        {[
+          {label:'Asking Rent', value: aud(l.asking_rent_weekly) + '/wk'},
+          {label:'Fair Rent', value: aud(ra.fair_weekly_rent) + '/wk', color:'var(--green)'},
+          {label:'Suburb Median', value: aud(ra.suburb_median_weekly_rent) + '/wk'},
+          {label:'Vacancy Rate', value: ra.vacancy_rate_pct != null ? pct(ra.vacancy_rate_pct) : '—'},
+        ].map(m => (
+          <div key={m.label} style={{background:'var(--surface2)',borderRadius:8,padding:'10px 12px'}}>
+            <div className="text-sm text-muted mb-8">{m.label}</div>
+            <div style={{fontWeight:800,fontSize:17,color:m.color||'var(--text)'}}>{m.value}</div>
+          </div>
+        ))}
+      </div>
+      <div className="flex gap-8 mb-12" style={{alignItems:'center',flexWrap:'wrap',marginBottom:12}}>
+        {ra.assessment && <span className={`pill ${assessCls}`}>{ra.assessment}</span>}
+        {gap != null && (
+          <span style={{fontWeight:700,color:gapColor,fontSize:14}}>
+            {gap > 0 ? `+${gap.toFixed(1)}% above fair` : `${gap.toFixed(1)}% below fair`}
+          </span>
+        )}
+        {ra.market_trend && <span className="pill pill-gray">Trend: {ra.market_trend}</span>}
+        {ra.confidence && <span className="pill pill-gray">Confidence: {ra.confidence}</span>}
+      </div>
+      {ra.reasoning && <div className="reasoning-box">{ra.reasoning}</div>}
+    </>
+  );
+}
+
+// ── Affordability Section ───────────────────────────────────────────────────
+function AffordabilitySection({ affordability: af = {}, listing: l = {} }) {
+  return (
+    <>
+      <div style={{marginBottom:16}}>
+        {[
+          {label:'Weekly Rent', value: aud(af.weekly_rent)},
+          {label:'Monthly Rent', value: aud(af.monthly_rent)},
+          {label:'Annual Rent', value: aud(af.annual_rent)},
+          {label:'Income needed (30% rule)', value: aud(af.income_needed_30pct_rule) + '/yr'},
+          {label:'Cost per Bedroom / week', value: aud(af.value_per_bedroom_weekly)},
+        ].map(r => (
+          <div key={r.label} className="info-row">
+            <span className="info-label">{r.label}</span>
+            <span className="font-bold">{r.value || '—'}</span>
+          </div>
+        ))}
+      </div>
+      <div className="reasoning-box" style={{fontSize:13,color:'var(--muted)'}}>
+        The 30% rule: financial advisers recommend spending no more than 30% of gross income on rent. The income figure above is the minimum annual household income to comfortably afford this property.
+      </div>
+    </>
+  );
+}
+
+// ── Inclusions Section ──────────────────────────────────────────────────────
+function InclusionsSection({ inclusions: inc = {} }) {
+  const items = [
+    {key:'parking', label:'Parking', icon:'🚗'},
+    {key:'storage', label:'Storage', icon:'📦'},
+    {key:'air_conditioning', label:'Air Conditioning', icon:'❄️'},
+    {key:'furnished', label:'Furnished', icon:'🛋️'},
+    {key:'pets_allowed', label:'Pets Allowed', icon:'🐾'},
+  ];
+  return (
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gap:10}}>
+      {items.map(({key,label,icon}) => {
+        const val = inc[key];
+        const isNull = val === null || val === undefined;
+        return (
+          <div key={key} style={{
+            background:'var(--surface2)',borderRadius:8,padding:'12px 14px',
+            display:'flex',alignItems:'center',gap:10,
+            opacity: isNull ? 0.5 : 1,
+          }}>
+            <span style={{fontSize:20}}>{icon}</span>
+            <div>
+              <div style={{fontSize:12,color:'var(--muted)',marginBottom:2}}>{label}</div>
+              <div style={{fontWeight:700,color: isNull ? 'var(--muted)' : val ? 'var(--green)' : 'var(--red)'}}>
+                {isNull ? 'Unknown' : val ? 'Yes' : 'No'}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Score Tiles ─────────────────────────────────────────────────────────────
+function ScoreTiles({ score = {}, keys }) {
+  const scoreKeys = keys || ['overall','value','yield','location','risk'];
+  return (
+    <div className="score-row">
+      {scoreKeys.map(k => {
+        const val = score[k] || 0;
+        return (
+          <div key={k} className="score-tile">
+            <div className="score-tile-label">{k}</div>
+            <ScoreBadge score={val} size="sm" />
+            <div className="score-bar-wrap">
+              <div className="score-bar" style={{width:`${val*10}%`, background: scoreColor(val)}}></div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── PDF Export ──────────────────────────────────────────────────────────────
+function exportPDF(property) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const { listing: l = {}, valuation: v = {}, rental: r = {}, financing: f = {}, score = {}, due_diligence: dd = {}, location: loc = {} } = property;
+  const W = 210, margin = 16;
+  let y = 20;
+
+  const text = (str, x, yy, opts = {}) => { doc.text(str || '', x, yy, opts); };
+  const line = (x1, y1, x2, y2) => doc.line(x1, y1, x2, y2);
+  const addPage = () => { doc.addPage(); y = 20; };
+  const checkY = (need = 20) => { if (y + need > 275) addPage(); };
+
+  // Header
+  doc.setFillColor(15, 17, 23);
+  doc.rect(0, 0, W, 40, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(18); doc.setFont('helvetica', 'bold');
+  text('Property Analysis Report', margin, 16);
+  doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+  doc.setTextColor(123, 130, 160);
+  text(l.address || '', margin, 24);
+  text(`Analysed: ${new Date(property.analysed_at).toLocaleDateString('en-AU')}`, margin, 30);
+
+  // Score badge
+  doc.setFillColor(79, 124, 255);
+  doc.circle(W - margin - 10, 20, 10, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(16); doc.setFont('helvetica', 'bold');
+  text(String(score.overall || 0), W - margin - 10, 23, {align:'center'});
+
+  y = 50;
+  doc.setTextColor(30, 30, 50);
+
+  // Verdict
+  if (score.verdict) {
+    doc.setFontSize(11); doc.setFont('helvetica', 'normal');
+    doc.setTextColor(50, 50, 80);
+    const lines = doc.splitTextToSize(score.verdict, W - margin * 2);
+    doc.text(lines, margin, y);
+    y += lines.length * 6 + 8;
+  }
+
+  // Key metrics
+  doc.setFillColor(245, 245, 250);
+  doc.rect(margin, y, W - margin*2, 28, 'F');
+  doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(100,100,120);
+  const metricW = (W - margin*2) / 4;
+  ['Asking Price','Est. Value','Gross Yield','Weekly Rent'].forEach((label, i) => {
+    text(label, margin + metricW * i + metricW/2, y + 6, {align:'center'});
+  });
+  doc.setFontSize(11); doc.setFont('helvetica', 'bold'); doc.setTextColor(30,30,50);
+  [aud(l.asking_price), aud(v.estimated_value), pct(r.gross_yield_pct), aud(r.estimated_weekly_rent)].forEach((val, i) => {
+    text(val, margin + metricW * i + metricW/2, y + 18, {align:'center'});
+  });
+  y += 36;
+
+  const sectionTitle = (title) => {
+    checkY(14);
+    doc.setFontSize(12); doc.setFont('helvetica', 'bold'); doc.setTextColor(30,30,50);
+    text(title, margin, y); y += 4;
+    doc.setDrawColor(79,124,255); line(margin, y, W - margin, y); y += 8;
+  };
+
+  const row = (label, value, indent = 0) => {
+    checkY(8);
+    doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(100,100,120);
+    text(label, margin + indent, y);
+    doc.setFont('helvetica', 'bold'); doc.setTextColor(30,30,50);
+    text(value || '—', W - margin, y, {align:'right'});
+    doc.setDrawColor(220,220,235); line(margin, y+2, W-margin, y+2);
+    y += 9;
+  };
+
+  // Valuation
+  sectionTitle('Valuation');
+  row('Estimated Value', aud(v.estimated_value));
+  row('Asking Price', aud(l.asking_price));
+  row('Price Assessment', v.price_assessment);
+  row('Price Gap', pct(v.price_gap_pct));
+  row('Comparable Range', `${aud(v.comparable_range_low)} – ${aud(v.comparable_range_high)}`);
+  row('Suburb Trend', v.suburb_trend);
+  row('Confidence', v.confidence);
+  if (v.reasoning) {
+    checkY(20);
+    doc.setFontSize(9); doc.setFont('helvetica', 'italic'); doc.setTextColor(80,80,100);
+    const lines = doc.splitTextToSize(v.reasoning, W - margin*2);
+    doc.text(lines, margin, y); y += lines.length * 5 + 8;
+  }
+
+  // Rental
+  sectionTitle('Rental Analysis');
+  row('Weekly Rent', aud(r.estimated_weekly_rent));
+  row('Annual Gross Income', aud(r.annual_gross_income));
+  row('Annual Net Income', aud(r.annual_net_income));
+  row('Gross Yield', pct(r.gross_yield_pct));
+  row('Net Yield', pct(r.net_yield_pct));
+  row('Vacancy Rate (Suburb)', pct(r.vacancy_rate_suburb_pct));
+  if (r.annual_expenses) {
+    const exp = r.annual_expenses;
+    if (exp.property_management) row('Property Management', aud(exp.property_management), 8);
+    if (exp.council_rates) row('Council Rates', aud(exp.council_rates), 8);
+    if (exp.insurance) row('Insurance', aud(exp.insurance), 8);
+    if (exp.maintenance_allowance) row('Maintenance', aud(exp.maintenance_allowance), 8);
+    if (exp.strata_fees) row('Strata Fees', aud(exp.strata_fees), 8);
+  }
+
+  // Financing
+  sectionTitle('Financing');
+  row('Stamp Duty Estimate', aud(f.stamp_duty_estimate));
+  row('Total Upfront Costs', aud(f.upfront_costs_estimate));
+  row('Suggested Deposit', `${f.suggested_deposit_pct}%`);
+  row('Loan Amount (20% dep.)', aud(f.loan_amount_at_20pct_deposit));
+  row('Repayment @ 5%', `${aud(f.monthly_repayment_estimate_5pct)}/mo`);
+  row('Repayment @ 6%', `${aud(f.monthly_repayment_estimate_6pct)}/mo`);
+  row('Repayment @ 7%', `${aud(f.monthly_repayment_estimate_7pct)}/mo`);
+
+  // Due Diligence
+  sectionTitle('Due Diligence');
+  const flags = dd.red_flags || [];
+  if (flags.length === 0) {
+    checkY(8); doc.setFontSize(10); doc.setTextColor(34,197,94); text('✓ No red flags identified', margin, y); y += 10;
+  }
+  flags.forEach(f => {
+    checkY(10);
+    const col = f.severity === 'high' ? [239,68,68] : f.severity === 'medium' ? [245,158,11] : [100,100,120];
+    doc.setTextColor(...col);
+    doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+    text(`[${(f.severity||'').toUpperCase()}]`, margin, y);
+    doc.setFont('helvetica', 'normal'); doc.setTextColor(50,50,70);
+    const lines = doc.splitTextToSize(f.flag, W - margin*2 - 20);
+    doc.text(lines, margin + 18, y); y += lines.length * 5 + 4;
+  });
+
+  // Location
+  sectionTitle('Location');
+  row('Flood Risk', loc.flood_risk);
+  row('Bushfire Risk', loc.bushfire_risk);
+  row('Schools', loc.schools_nearby);
+  row('Transport', loc.transport_access);
+  if (loc.amenities) row('Amenities', loc.amenities);
+  if (loc.growth_drivers) {
+    checkY(16);
+    doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(50,50,70);
+    text('Growth Drivers:', margin, y); y += 6;
+    const drivers = Array.isArray(loc.growth_drivers) ? loc.growth_drivers.join(', ') : loc.growth_drivers;
+    doc.setFont('helvetica', 'normal');
+    const lines = doc.splitTextToSize(drivers, W - margin*2);
+    doc.text(lines, margin, y); y += lines.length * 5 + 8;
+  }
+
+  // Scores
+  sectionTitle('Scores');
+  ['overall','value','yield','location','risk'].forEach(k => {
+    row(k.charAt(0).toUpperCase() + k.slice(1), `${score[k] || 0}/10`);
+  });
+
+  // Footer
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8); doc.setTextColor(150,150,170);
+    doc.text(`Property Analyser — ${l.address || ''}`, margin, 290);
+    doc.text(`Page ${i} of ${pageCount}`, W - margin, 290, {align:'right'});
+  }
+
+  doc.save(`property-analysis-${(l.address || 'report').replace(/[^a-z0-9]/gi, '-').toLowerCase()}.pdf`);
+}
+
+// ── Shared report header ────────────────────────────────────────────────────
+function ReportHeader({ property: p, onBack, onDelete, subtitle }) {
+  const { listing: l = {}, score = {} } = p;
+  return (
+    <>
+      <button className="back-btn" onClick={onBack}>← Back to properties</button>
+      <div className="report-header">
+        <ScoreBadge score={score.overall} size="lg" />
+        <div className="report-header-info">
+          <div className="report-address">{l.address}</div>
+          <div className="report-suburb">{subtitle}</div>
+          {score.verdict && <div className="report-verdict">{score.verdict}</div>}
+          <div className="report-actions">
+            {l.url && <a href={l.url} target="_blank" rel="noreferrer" className="btn-rea"><span className="btn-rea-house">⌂</span><span className="btn-rea-text">realestate<span className="btn-rea-domain">.com.au</span></span></a>}
+            <button className="btn btn-primary btn-sm" onClick={() => exportPDF(p)}>⬇ Download PDF</button>
+            <button className="btn btn-danger btn-sm" onClick={() => { if (confirm('Delete this property analysis?')) onDelete(p.id); }}>Delete</button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ── Rental Property Report ──────────────────────────────────────────────────
+function RentalPropertyReport({ property: p, onBack, onDelete }) {
+  const { listing: l = {}, rent_assessment: ra = {}, affordability: af = {}, score = {} } = p;
+  const gap = ra.rent_gap_pct;
+  const gapColor = gap > 5 ? 'var(--red)' : gap < -5 ? 'var(--green)' : 'var(--amber)';
+
+  return (
+    <div>
+      <ReportHeader
+        property={p} onBack={onBack} onDelete={onDelete}
+        subtitle={`${[l.suburb, l.state, l.postcode].filter(Boolean).join(', ')} · ${l.type || ''} · Rental`}
+      />
+
+      <div className="metrics-row">
+        <div className="metric-tile">
+          <div className="metric-tile-label">Weekly Rent</div>
+          <div className="metric-tile-value">{aud(l.asking_rent_weekly)}</div>
+          <div className="metric-tile-sub">{l.bedrooms}bd · {l.bathrooms}ba · {l.car_spaces ?? 0}car</div>
+        </div>
+        <div className="metric-tile">
+          <div className="metric-tile-label">Fair Rent</div>
+          <div className="metric-tile-value" style={{color:'var(--green)'}}>{aud(ra.fair_weekly_rent)}</div>
+          <div className="metric-tile-sub">Suburb median: {aud(ra.suburb_median_weekly_rent)}</div>
+        </div>
+        <div className="metric-tile">
+          <div className="metric-tile-label">vs Market</div>
+          <div className="metric-tile-value" style={{color: gapColor}}>
+            {gap != null ? `${gap > 0 ? '+' : ''}${(+gap).toFixed(1)}%` : '—'}
+          </div>
+          <div className="metric-tile-sub">{ra.assessment || '—'}</div>
+        </div>
+        <div className="metric-tile">
+          <div className="metric-tile-label">Monthly Cost</div>
+          <div className="metric-tile-value">{aud(af.monthly_rent)}</div>
+          <div className="metric-tile-sub">{aud(af.annual_rent)}/yr</div>
+        </div>
+        <div className="metric-tile">
+          <div className="metric-tile-label">$/Bedroom/wk</div>
+          <div className="metric-tile-value">{aud(af.value_per_bedroom_weekly)}</div>
+          <div className="metric-tile-sub">Income needed: {aud(af.income_needed_30pct_rule)}/yr</div>
+        </div>
+        {l.floor_size_sqm && (
+          <div className="metric-tile">
+            <div className="metric-tile-label">Floor Size</div>
+            <div className="metric-tile-value">{num(l.floor_size_sqm)} m²</div>
+            <div className="metric-tile-sub">&nbsp;</div>
+          </div>
+        )}
+      </div>
+
+      <ScoreTiles score={score} keys={['overall','value','location','risk']} />
+
+      <Section title="Rent Assessment" icon="💰" defaultOpen={true}>
+        <RentAssessmentSection rent_assessment={ra} listing={l} />
+      </Section>
+      <Section title="Affordability" icon="📋">
+        <AffordabilitySection affordability={af} listing={l} />
+      </Section>
+      <Section title="Inclusions" icon="✅">
+        <InclusionsSection inclusions={p.inclusions} />
+      </Section>
+      <Section title="Due Diligence" icon="🔍">
+        <DueDiligenceSection due_diligence={p.due_diligence} />
+      </Section>
+      <Section title="Location" icon="📍">
+        <LocationSection location={p.location} />
+      </Section>
+      <Section title="Listing Details" icon="📋">
+        <div>
+          {[
+            {label:'URL', value: l.url ? <a href={l.url} target="_blank" rel="noreferrer" style={{color:'var(--accent)'}}>{l.url}</a> : null},
+            {label:'Days on Market', value: l.days_on_market},
+            {label:'Description', value: l.description_summary},
+          ].map(item => item.value ? (
+            <div key={item.label} className="info-row">
+              <span className="info-label">{item.label}</span>
+              <span style={{maxWidth:'65%',textAlign:'right',lineHeight:1.4}}>{item.value}</span>
+            </div>
+          ) : null)}
+          <div style={{marginTop:12,fontSize:12,color:'var(--muted)'}}>Analysed: {new Date(p.analysed_at).toLocaleString('en-AU')}</div>
+        </div>
+      </Section>
+    </div>
+  );
+}
+
+// ── Buy/Invest Property Report ──────────────────────────────────────────────
+function PropertyReport({ property: p, onBack, onDelete }) {
+  if (p.analysis_type === 'rental') return <RentalPropertyReport property={p} onBack={onBack} onDelete={onDelete} />;
+
+  const { listing: l = {}, valuation: v = {}, rental: r = {}, score = {} } = p;
+  const priceDiff = v.estimated_value && l.asking_price
+    ? ((l.asking_price - v.estimated_value) / v.estimated_value * 100).toFixed(1)
+    : null;
+
+  return (
+    <div>
+      <ReportHeader
+        property={p} onBack={onBack} onDelete={onDelete}
+        subtitle={`${[l.suburb, l.state, l.postcode].filter(Boolean).join(', ')} · ${l.type || ''} · ${l.purpose || ''}`}
+      />
+
+      {/* Summary metrics */}
+      <div className="metrics-row">
+        <div className="metric-tile">
+          <div className="metric-tile-label">Asking Price</div>
+          <div className="metric-tile-value">{aud(l.asking_price)}</div>
+          <div className="metric-tile-sub">{l.bedrooms}bd · {l.bathrooms}ba · {l.car_spaces}car</div>
+        </div>
+        <div className="metric-tile">
+          <div className="metric-tile-label">Estimated Value</div>
+          <div className="metric-tile-value" style={{color:'var(--green)'}}>{aud(v.estimated_value)}</div>
+          <div className="metric-tile-sub"><AssessmentPill value={v.price_assessment} /></div>
+        </div>
+        <div className="metric-tile">
+          <div className="metric-tile-label">Price Gap</div>
+          <div className="metric-tile-value" style={{color: priceDiff > 0 ? 'var(--red)' : 'var(--green)'}}>
+            {priceDiff !== null ? `${priceDiff > 0 ? '+' : ''}${priceDiff}%` : '—'}
+          </div>
+          <div className="metric-tile-sub">vs estimated value</div>
+        </div>
+        <div className="metric-tile">
+          <div className="metric-tile-label">Gross Yield</div>
+          <div className="metric-tile-value" style={{color:'var(--green)'}}>{pct(r.gross_yield_pct)}</div>
+          <div className="metric-tile-sub">Net: {pct(r.net_yield_pct)}</div>
+        </div>
+        <div className="metric-tile">
+          <div className="metric-tile-label">Weekly Rent</div>
+          <div className="metric-tile-value">{aud(r.estimated_weekly_rent)}</div>
+          <div className="metric-tile-sub">{aud(r.annual_gross_income)}/yr gross</div>
+        </div>
+        {l.land_size_sqm && (
+          <div className="metric-tile">
+            <div className="metric-tile-label">Land Size</div>
+            <div className="metric-tile-value">{num(l.land_size_sqm)} m²</div>
+            {l.floor_size_sqm && <div className="metric-tile-sub">Floor: {num(l.floor_size_sqm)} m²</div>}
+          </div>
+        )}
+      </div>
+
+      {/* Score tiles */}
+      <ScoreTiles score={score} />
+
+      {/* Collapsible sections */}
+      <Section title="Valuation" icon="📊" defaultOpen={true}>
+        <ValuationSection valuation={v} listing={l} />
+      </Section>
+      <Section title="Rental Analysis" icon="💰">
+        <RentalSection rental={p.rental} />
+      </Section>
+      <Section title="Financing" icon="🏦">
+        <FinancingSection financing={p.financing} />
+      </Section>
+      <Section title="Due Diligence" icon="🔍">
+        <DueDiligenceSection due_diligence={p.due_diligence} />
+      </Section>
+      <Section title="Location" icon="📍">
+        <LocationSection location={p.location} />
+      </Section>
+
+      {/* Raw listing info */}
+      <Section title="Listing Details" icon="📋">
+        <div>
+          {[
+            {label:'URL', value: l.url ? <a href={l.url} target="_blank" rel="noreferrer" style={{color:'var(--accent)'}}>{l.url}</a> : null},
+            {label:'Days on Market', value: l.days_on_market},
+            {label:'Description', value: l.description_summary},
+          ].map(item => item.value ? (
+            <div key={item.label} className="info-row">
+              <span className="info-label">{item.label}</span>
+              <span style={{maxWidth:'65%',textAlign:'right',lineHeight:1.4}}>{item.value}</span>
+            </div>
+          ) : null)}
+          <div style={{marginTop:12,fontSize:12,color:'var(--muted)'}}>
+            Analysed: {new Date(p.analysed_at).toLocaleString('en-AU')}
+          </div>
+        </div>
+      </Section>
+    </div>
+  );
+}
+
+// ── Comparison View ─────────────────────────────────────────────────────────
+function ComparisonView({ properties, onClear, onViewProperty }) {
+  const rows = [
+    { label: 'Overall Score', get: p => p.score?.overall, format: v => v, type: 'score', bestHigh: true },
+    { label: 'Asking Price', get: p => p.listing?.asking_price, format: aud, bestHigh: false },
+    { label: 'Est. Value', get: p => p.valuation?.estimated_value, format: aud, bestHigh: true },
+    { label: 'Price Gap %', get: p => p.valuation?.price_gap_pct, format: v => `${(+v||0).toFixed(1)}%`, bestHigh: false },
+    { label: 'Price Assessment', get: p => p.valuation?.price_assessment, format: v => v, type: 'pill', bestHigh: false },
+    { label: 'Gross Yield', get: p => p.rental?.gross_yield_pct, format: pct, bestHigh: true },
+    { label: 'Net Yield', get: p => p.rental?.net_yield_pct, format: pct, bestHigh: true },
+    { label: 'Weekly Rent', get: p => p.rental?.estimated_weekly_rent, format: aud, bestHigh: true },
+    { label: 'Value Score', get: p => p.score?.value, format: v => `${v}/10`, bestHigh: true },
+    { label: 'Yield Score', get: p => p.score?.yield, format: v => `${v}/10`, bestHigh: true },
+    { label: 'Location Score', get: p => p.score?.location, format: v => `${v}/10`, bestHigh: true },
+    { label: 'Risk Score', get: p => p.score?.risk, format: v => `${v}/10`, bestHigh: true },
+    { label: 'Red Flags', get: p => (p.due_diligence?.red_flags || []).length, format: v => v, bestHigh: false },
+    { label: 'Flood Risk', get: p => p.location?.flood_risk, format: v => v, type: 'risk' },
+    { label: 'Bushfire Risk', get: p => p.location?.bushfire_risk, format: v => v, type: 'risk' },
+    { label: 'Suburb Trend', get: p => p.valuation?.suburb_trend, format: v => v },
+  ];
+
+  const getBest = (row) => {
+    if (row.type === 'pill' || row.type === 'risk' || row.bestHigh === undefined) return null;
+    const vals = properties.map(p => +row.get(p) || 0);
+    return row.bestHigh ? Math.max(...vals) : Math.min(...vals);
+  };
+
+  return (
+    <div>
+      <div className="compare-header">
+        <div>
+          <h2 style={{fontSize:20,fontWeight:800,marginBottom:4}}>Comparison</h2>
+          <p className="text-muted text-sm">{properties.length} properties selected</p>
+        </div>
+        <button className="btn btn-ghost btn-sm" onClick={onClear}>Clear Selection</button>
+      </div>
+
+      <div className="compare-table-wrap card" style={{padding:0}}>
+        <table className="compare-table">
+          <thead>
+            <tr>
+              <th style={{width:160}}>Metric</th>
+              {properties.map(p => (
+                <th key={p.id} className="prop-col">
+                  <div style={{fontWeight:700,fontSize:13,marginBottom:4}}>{p.listing?.address}</div>
+                  <div style={{color:'var(--muted)',fontSize:11}}>{p.listing?.suburb}</div>
+                  <button className="btn btn-ghost btn-sm" style={{marginTop:6,padding:'3px 8px',fontSize:11}} onClick={() => onViewProperty(p)}>View</button>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(row => {
+              const best = getBest(row);
+              return (
+                <tr key={row.label}>
+                  <td className="row-label">{row.label}</td>
+                  {properties.map(p => {
+                    const raw = row.get(p);
+                    const numVal = +raw || 0;
+                    const isBest = best !== null && numVal === best;
+                    return (
+                      <td key={p.id} className={`prop-col ${isBest ? 'best-val' : ''}`}>
+                        {row.type === 'score'
+                          ? <ScoreBadge score={raw} size="sm" />
+                          : row.type === 'pill'
+                          ? <AssessmentPill value={raw} />
+                          : row.type === 'risk'
+                          ? <RiskPill label="" value={raw} />
+                          : <span style={{fontWeight: isBest ? 700 : 400, color: isBest ? 'var(--green)' : 'inherit'}}>{row.format(raw) || '—'}</span>
+                        }
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ── Home View ───────────────────────────────────────────────────────────────
+function HomeView({ properties, onAddProperty, onView, selectedIds, onToggleSelect, onCompare }) {
+  const [sort, setSort] = useState('date');
+  const [filter, setFilter] = useState('all'); // 'all' | 'buy' | 'rent'
+
+  const filtered = properties.filter(p =>
+    filter === 'all' ? true :
+    filter === 'rent' ? p.analysis_type === 'rental' :
+    p.analysis_type !== 'rental'
+  );
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (sort === 'score') return (b.score?.overall || 0) - (a.score?.overall || 0);
+    if (sort === 'price') return (a.listing?.asking_price || a.listing?.asking_rent_weekly || 0) - (b.listing?.asking_price || b.listing?.asking_rent_weekly || 0);
+    if (sort === 'yield') return (b.rental?.gross_yield_pct || 0) - (a.rental?.gross_yield_pct || 0);
+    return new Date(b.analysed_at || 0) - new Date(a.analysed_at || 0);
+  });
+
+  const buyCount = properties.filter(p => p.analysis_type !== 'rental').length;
+  const rentCount = properties.filter(p => p.analysis_type === 'rental').length;
+
+  return (
+    <div>
+      <div className="toolbar">
+        <div className="toolbar-left">
+          <div className="filter-tabs">
+            <button className={`filter-tab ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>All {properties.length}</button>
+            <button className={`filter-tab ${filter === 'buy' ? 'active' : ''}`} onClick={() => setFilter('buy')}>🏠 Buy {buyCount}</button>
+            <button className={`filter-tab ${filter === 'rent' ? 'active' : ''}`} onClick={() => setFilter('rent')}>🔑 Rent {rentCount}</button>
+          </div>
+          <select className="sort-select" value={sort} onChange={e => setSort(e.target.value)}>
+            <option value="date">Sort: Date Added</option>
+            <option value="score">Sort: Overall Score</option>
+            <option value="price">Sort: Price (Low–High)</option>
+            <option value="yield">Sort: Gross Yield</option>
+          </select>
+          {selectedIds.length >= 2 && (
+            <button className="btn btn-secondary btn-sm" onClick={onCompare}>
+              ⇔ Compare {selectedIds.length}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {properties.length === 0 ? (
+        <div className="empty">
+          <div className="empty-icon">🏠</div>
+          <h2>No properties yet</h2>
+          <p>Import a property analysis JSON to get started.</p>
+          <div style={{display:'flex',gap:10,justifyContent:'center',flexWrap:'wrap'}}>
+            <button className="btn btn-primary" onClick={onAddProperty}>+ Import JSON</button>
+          </div>
+        </div>
+      ) : sorted.length === 0 ? (
+        <div className="empty">
+          <div className="empty-icon">{filter === 'rent' ? '🔑' : '🏠'}</div>
+          <h2>No {filter === 'rent' ? 'rental' : 'buy'} analyses yet</h2>
+          <p>Import a JSON with {filter === 'rent' ? '"analysis_type": "rental"' : 'investment analysis'} data.</p>
+        </div>
+      ) : (
+        <div className="property-grid">
+          {sorted.map(p => (
+            <PropertyCard
+              key={p.id}
+              property={p}
+              selected={selectedIds.includes(p.id)}
+              onSelect={onToggleSelect}
+              onClick={onView}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Root App ────────────────────────────────────────────────────────────────
+function App() {
+  const [properties, setProperties] = useState(loadProperties);
+  const [view, setView] = useState('home'); // 'home' | 'report' | 'compare'
+  const [activeProperty, setActiveProperty] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
+
+  useEffect(() => { saveProperties(properties); }, [properties]);
+
+  // On startup, fetch properties from S3
+  useEffect(() => {
+    fetch('https://property-analyser-app.s3.ap-southeast-2.amazonaws.com/data/properties.json')
+      .then(r => r.ok ? r.json() : null)
+      .then(remote => {
+        if (!remote || !remote.length) return;
+        setProperties(local => mergeProps(local, remote));
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleAdd = (data) => {
+    setProperties(prev => {
+      const exists = prev.findIndex(p => p.id === data.id);
+      if (exists >= 0) {
+        const updated = [...prev];
+        updated[exists] = data;
+        return updated;
+      }
+      return [data, ...prev];
+    });
+    setShowAddModal(false);
+    setActiveProperty(data);
+    setView('report');
+  };
+
+  const handleDelete = (id) => {
+    setProperties(prev => prev.filter(p => p.id !== id));
+    setSelectedIds(prev => prev.filter(s => s !== id));
+    setView('home');
+    setActiveProperty(null);
+  };
+
+  const handleToggleSelect = (id) => {
+    setSelectedIds(prev =>
+      prev.includes(id)
+        ? prev.filter(s => s !== id)
+        : prev.length < 5 ? [...prev, id] : prev
+    );
+  };
+
+  const handleCompare = () => setView('compare');
+
+  const [syncing, setSyncing] = React.useState(false);
+
+  const handleSync = async () => {
+    setSyncing(true);
+    try {
+      const res = await fetch('http://localhost:3001/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(properties),
+      });
+      const merged = await res.json();
+      if (!res.ok) throw new Error(merged.error || 'Sync failed');
+      setProperties(merged);
+      alert(`Synced ✓  ${merged.length} propert${merged.length !== 1 ? 'ies' : 'y'} on S3.`);
+    } catch (e) {
+      alert(`Sync failed: ${e.message}`);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleExport = () => {
+    const blob = new Blob([JSON.stringify(properties, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `property-analyses-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportFile = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        const incoming = Array.isArray(data) ? data : [data];
+        setProperties(prev => {
+          const merged = [...prev];
+          incoming.forEach(p => {
+            if (!p.id) p.id = Date.now().toString();
+            const idx = merged.findIndex(x => x.id === p.id);
+            if (idx >= 0) merged[idx] = p; else merged.unshift(p);
+          });
+          return merged;
+        });
+        alert(`Imported ${incoming.length} propert${incoming.length !== 1 ? 'ies' : 'y'}.`);
+      } catch {
+        alert('Invalid JSON file.');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  const handleViewProperty = (p) => {
+    setActiveProperty(p);
+    setView('report');
+  };
+
+  const selectedProperties = properties.filter(p => selectedIds.includes(p.id));
+
+  return (
+    <div className="app">
+      <nav className="nav">
+        <div className="nav-logo" style={{cursor:'pointer'}} onClick={() => setView('home')}>
+          🏠 Property Analyser
+        </div>
+        {view !== 'home' && (
+          <button className="btn btn-ghost btn-sm" onClick={() => setView('home')}>← All Properties</button>
+        )}
+        {selectedIds.length >= 2 && view !== 'compare' && (
+          <button className="btn btn-secondary btn-sm" onClick={handleCompare}>⇔ Compare {selectedIds.length}</button>
+        )}
+        <button className="btn btn-ghost btn-sm" onClick={handleSync} disabled={syncing} title="Sync to S3">
+          {syncing ? '↻ Syncing…' : '☁ Sync'}
+        </button>
+        <button className="btn btn-ghost btn-sm" onClick={handleExport} title="Export all properties">⬇ Export</button>
+        <label className="btn btn-ghost btn-sm" title="Import properties from file" style={{cursor:'pointer'}}>
+          ⬆ Import<input type="file" accept=".json" style={{display:'none'}} onChange={handleImportFile} />
+        </label>
+        <button className="btn btn-primary btn-sm" onClick={() => setShowAddModal(true)}>+ Import JSON</button>
+      </nav>
+
+      <main className="main">
+        {view === 'home' && (
+          <HomeView
+            properties={properties}
+            onAddProperty={() => setShowAddModal(true)}
+            onView={handleViewProperty}
+            selectedIds={selectedIds}
+            onToggleSelect={handleToggleSelect}
+            onCompare={handleCompare}
+          />
+        )}
+        {view === 'report' && activeProperty && (
+          <PropertyReport
+            property={activeProperty}
+            onBack={() => setView('home')}
+            onDelete={handleDelete}
+          />
+        )}
+        {view === 'compare' && (
+          <ComparisonView
+            properties={selectedProperties}
+            onClear={() => { setSelectedIds([]); setView('home'); }}
+            onViewProperty={handleViewProperty}
+          />
+        )}
+      </main>
+
+      {showAddModal && (
+        <AddPropertyModal
+          onClose={() => setShowAddModal(false)}
+          onAdd={handleAdd}
+        />
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
