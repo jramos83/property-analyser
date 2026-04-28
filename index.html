@@ -1470,17 +1470,45 @@ function SyncSettingsModal({ onClose, onSyncNow }) {
   );
 }
 
+// ── Hash routing helpers ─────────────────────────────────────────────────────
+function parseHash() {
+  const h = window.location.hash; // e.g. #/property/123
+  const m = h.match(/^#\/property\/(.+)$/);
+  return m ? { view: 'report', id: m[1] } : { view: 'home', id: null };
+}
+
+function setHash(view, id) {
+  const next = view === 'report' && id ? `#/property/${id}` : '#';
+  if (window.location.hash !== next) window.location.hash = next;
+}
+
 // ── Root App ────────────────────────────────────────────────────────────────
 function App() {
   const [properties, setProperties] = useState(loadProperties);
-  const [view, setView] = useState('home');
-  const [activeProperty, setActiveProperty] = useState(null);
+  const [view, setView] = useState(() => parseHash().view);
+  const [activeId, setActiveId] = useState(() => parseHash().id);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showSyncModal, setShowSyncModal] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [syncStatus, setSyncStatus] = useState('idle'); // 'idle'|'saving'|'saved'|'error'
   const saveTimer = useRef(null);
   const initialized = useRef(false);
+
+  const activeProperty = properties.find(p => p.id === activeId) || null;
+
+  // Sync view state → URL hash
+  useEffect(() => { setHash(view, activeId); }, [view, activeId]);
+
+  // Sync URL hash → view state (browser back/forward)
+  useEffect(() => {
+    const onHash = () => {
+      const { view: v, id } = parseHash();
+      setView(v);
+      setActiveId(id);
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
 
   useEffect(() => { saveProperties(properties); }, [properties]);
 
@@ -1521,7 +1549,7 @@ function App() {
       return [data, ...prev];
     });
     setShowAddModal(false);
-    setActiveProperty(data);
+    setActiveId(data.id);
     setView('report');
   };
 
@@ -1529,7 +1557,7 @@ function App() {
     setProperties(prev => prev.filter(p => p.id !== id));
     setSelectedIds(prev => prev.filter(s => s !== id));
     setView('home');
-    setActiveProperty(null);
+    setActiveId(null);
   };
 
   const handleDeleteSelected = (ids) => {
@@ -1619,7 +1647,7 @@ function App() {
           <HomeView
             properties={properties}
             onAddProperty={() => setShowAddModal(true)}
-            onView={p => { setActiveProperty(p); setView('report'); }}
+            onView={p => { setActiveId(p.id); setView('report'); }}
             selectedIds={selectedIds}
             onToggleSelect={handleToggleSelect}
             onCompare={handleCompare}
@@ -1634,7 +1662,7 @@ function App() {
           <ComparisonView
             properties={selectedProperties}
             onClear={() => { setSelectedIds([]); setView('home'); }}
-            onViewProperty={p => { setActiveProperty(p); setView('report'); }}
+            onViewProperty={p => { setActiveId(p.id); setView('report'); }}
           />
         )}
       </main>
