@@ -1,5 +1,146 @@
 [
   {
+    "id": "1745891400000",
+    "analysed_at": "2026-04-29T01:15:00.000Z",
+    "analysis_type": "purchase",
+    "listing": {
+      "address": "31 Rosedale Avenue",
+      "suburb": "Penrith",
+      "state": "NSW",
+      "postcode": "2750",
+      "type": "House",
+      "purpose": "investment",
+      "url": "https://www.realestate.com.au/property-house-nsw-penrith-150862172",
+      "asking_price": 1175000,
+      "bedrooms": 3,
+      "bathrooms": 1,
+      "car_spaces": 1,
+      "land_size_sqm": null,
+      "floor_size_sqm": null,
+      "days_on_market": null,
+      "description_summary": "Three-bedroom brick house in Penrith zoned R3 Medium Density, offering development upside subject to council approval. Features zoned ducted air conditioning, mirrored built-in wardrobes, undercover patio and backyard. Walking distance to Penrith South Public School, local shops, and minutes from Penrith Station and Westfield Penrith."
+    },
+    "valuation": {
+      "estimated_value": 1040000,
+      "comparable_range_low": 970000,
+      "comparable_range_high": 1110000,
+      "price_gap_pct": 12.98,
+      "price_assessment": "overpriced",
+      "suburb_trend": "Rising",
+      "confidence": "Medium",
+      "reasoning": "Penrith 3-bed/1-bath houses on standard residential blocks were trading in the $900,000–$960,000 range through Q1 2026, with renovated stock pushing into the high-$900Ks. The asking range of $1,150,000–$1,200,000 implies a $200,000+ premium over comparable residential stock, which is only justified by the R3 Medium Density zoning enabling potential dual-occupancy or duplex development. A reasonable land-uplift attribution for confirmed R3 with viable lot dimensions is $80,000–$140,000, which supports a fair value around $1,040,000. The vendor is asking for the full development premium without the buyer having yet verified that the development is feasible — that's a risk transfer to the buyer. Western Sydney Airport opening in late 2026 is a known tailwind already partially priced in across the corridor."
+    },
+    "rental": {
+      "estimated_weekly_rent": 600,
+      "annual_gross_income": 31200,
+      "annual_net_income": 19604,
+      "gross_yield_pct": 2.66,
+      "net_yield_pct": 1.67,
+      "vacancy_rate_suburb_pct": 1.6,
+      "annual_expenses": {
+        "property_management": 2496,
+        "council_rates": 2300,
+        "insurance": 1800,
+        "maintenance_allowance": 5000,
+        "strata_fees": 0
+      }
+    },
+    "financing": {
+      "stamp_duty_estimate": 48730,
+      "upfront_costs_estimate": 62500,
+      "suggested_deposit_pct": 20,
+      "loan_amount_at_20pct_deposit": 940000,
+      "monthly_repayment_estimate_5pct": 5046,
+      "monthly_repayment_estimate_6pct": 5636,
+      "monthly_repayment_estimate_7pct": 6254
+    },
+    "due_diligence": {
+      "red_flags": [
+        {
+          "flag": "Asking price embeds the full R3 development premium ($100K+) but the buyer assumes all development risk — feasibility, council approval, construction cost, and market timing.",
+          "severity": "high"
+        },
+        {
+          "flag": "Single bathroom on a 3-bed house caps both rental demand (most family tenants want 2 bath) and resale liquidity. Adding an ensuite is a $25K–$40K project before any development.",
+          "severity": "medium"
+        },
+        {
+          "flag": "Gross yield of 2.66% means $31,200 annual rent against ~$56,400 annual interest at 6% on a $940K loan. Holding cost ~$25K/year before depreciation, even with positive tax outcome.",
+          "severity": "high"
+        },
+        {
+          "flag": "Land size, frontage, and Section 10.7 zoning certificate are not in the listing — these are essential to validate the R3 development thesis. Insufficient data to make a development call.",
+          "severity": "high"
+        },
+        {
+          "flag": "Penrith LGA includes flood-prone areas near the Nepean River. Verify the specific lot is not in a flood overlay before bidding.",
+          "severity": "medium"
+        }
+      ],
+      "days_on_market_flag": false,
+      "checklist": [
+        {
+          "item": "Order Section 10.7 Planning Certificate from Penrith City Council to confirm R3 zoning, lot constraints, and any overlays.",
+          "priority": "high"
+        },
+        {
+          "item": "Confirm minimum lot size for dual-occupancy / duplex under Penrith LEP 2010 (clause 4.1B) — typically 600m²+ for duplex.",
+          "priority": "high"
+        },
+        {
+          "item": "Get a preliminary development feasibility from a local builder/architect before bidding above $1,050,000.",
+          "priority": "high"
+        },
+        {
+          "item": "Pest and building inspection — single-bathroom layout suggests original fitout with potential deferred maintenance.",
+          "priority": "high"
+        },
+        {
+          "item": "Pull last 6 months of comparable sales within 1km from CoreLogic or PriceFinder; specifically isolate R3-zoned sales to validate the premium.",
+          "priority": "high"
+        },
+        {
+          "item": "Get 2–3 rental appraisals from local Penrith property managers — current market rent is the single biggest variable in the holding cost.",
+          "priority": "high"
+        },
+        {
+          "item": "Check flood maps on Penrith City Council's online portal for the specific address.",
+          "priority": "medium"
+        },
+        {
+          "item": "Negotiate hard — open with $1,030,000–$1,050,000 based on residential comparables plus R3 floor premium.",
+          "priority": "medium"
+        },
+        {
+          "item": "Verify ducted A/C age and recent service history.",
+          "priority": "low"
+        }
+      ]
+    },
+    "location": {
+      "flood_risk": "Medium",
+      "bushfire_risk": "Low",
+      "schools_nearby": "Penrith South Public School within walking distance. Penrith High School (selective) and Trinity Catholic College within 2 km. Western Sydney University Penrith/Kingswood campus ~3 km.",
+      "transport_access": "Penrith Station (T1 Western Line, ~55 min to Sydney CBD) approximately 1.5 km. Kingswood Station also nearby. Direct M4 Motorway access east toward Parramatta and the Sydney CBD. Regular bus routes on surrounding arterials.",
+      "amenities": "Westfield Penrith and Nepean Village shopping precincts within 2 km. Nepean Hospital (major regional hospital) nearby. East Bank dining and entertainment precinct along the Nepean River. Stafford Street local shops walkable.",
+      "growth_drivers": [
+        "Western Sydney International Airport opening late 2026 — 28,000+ jobs forecast in the Western Parkland City",
+        "Aerotropolis precinct development and planned Sydney Metro Western Sydney Airport rail link",
+        "Nepean Hospital expansion and Penrith health/education precinct investment",
+        "Penrith designated as a strategic regional CBD in the Greater Sydney Region Plan",
+        "R3 zoning provides medium-term development optionality as the suburb densifies"
+      ]
+    },
+    "score": {
+      "overall": 5,
+      "value": 4,
+      "yield": 3,
+      "location": 7,
+      "risk": 6,
+      "verdict": "31 Rosedale Avenue is a development-optionality play priced as if the development is a done deal — but the buyer hasn't yet verified that the R3 zoning translates to a feasible duplex on this specific lot. At $1,175,000 the asking sits roughly 13% above comparable residential 3-bed/1-bath stock in Penrith, with the gap representing the implied land uplift from R3. Yield economics are tough: $600/week rent against ~$5,600/month repayments at 6% leaves a ~$25K/year holding cost before depreciation. The Western Sydney Airport thesis is real but is already partially priced into the entire corridor. This property suits a buyer who (a) verifies development feasibility BEFORE bidding, (b) can hold for 5+ years to capture the airport-driven growth cycle, and (c) has the cash flow to absorb negative gearing of $20K–$25K/year. Walk-away price for a passive investor: $1,050,000. Walk-away price for a developer who has confirmed duplex viability: $1,150,000–$1,180,000. Negotiate hard."
+    }
+  },
+  {
     "id": "1746057600000",
     "analysed_at": "2026-04-29T00:30:00.000Z",
     "analysis_type": "rental",
