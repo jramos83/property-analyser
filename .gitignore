@@ -2,5 +2,6 @@ proxy.js
 proxy.py
 proxy.log
 proxy_debug.txt
+properties.json
 _*.json
 .claude/

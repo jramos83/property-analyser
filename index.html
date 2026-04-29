@@ -1408,49 +1408,34 @@ function HomeView({ properties, onAddProperty, onView, selectedIds, onToggleSele
   );
 }
 
-// ── GitHub sync ──────────────────────────────────────────────────────────────
-const GH_API = 'https://api.github.com/repos/jramos83/property-analyser/contents/properties.json';
-const PAT_KEY = 'gh_pat';
+// ── S3 sync (read direct from S3, write via local proxy) ────────────────────
+const S3_URL = 'https://property-analyser-app.s3.ap-southeast-2.amazonaws.com/data/properties.json';
+const PROXY_SYNC = 'http://localhost:3001/sync';
 
-async function githubSave(props) {
-  const pat = localStorage.getItem(PAT_KEY);
-  if (!pat) return 'no-pat';
-  const headers = { Authorization: `token ${pat}`, 'Content-Type': 'application/json' };
-  const getRes = await fetch(GH_API, { headers });
-  if (!getRes.ok) throw new Error(`GitHub read failed: ${getRes.status}`);
-  const { sha } = await getRes.json();
-  const content = btoa(unescape(encodeURIComponent(JSON.stringify(props, null, 2))));
-  const putRes = await fetch(GH_API, {
-    method: 'PUT',
-    headers,
-    body: JSON.stringify({ message: `Update properties (${props.length})`, content, sha }),
+async function proxySave(props) {
+  const res = await fetch(PROXY_SYNC, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(props),
   });
-  if (!putRes.ok) throw new Error(`GitHub write failed: ${putRes.status}`);
+  if (!res.ok) throw new Error(`Proxy sync failed: ${res.status}`);
+  return res.json();
 }
 
-// ── GitHub sync settings modal ───────────────────────────────────────────────
+// ── Sync info modal ─────────────────────────────────────────────────────────
 function SyncSettingsModal({ onClose, onSyncNow }) {
-  const [pat, setPat] = React.useState(localStorage.getItem(PAT_KEY) || '');
   const [pushStatus, setPushStatus] = React.useState('idle'); // 'idle'|'pushing'|'ok'|'error'
   const [pushError, setPushError] = React.useState('');
 
-  const save = () => {
-    if (pat.trim()) localStorage.setItem(PAT_KEY, pat.trim());
-    else localStorage.removeItem(PAT_KEY);
-    onClose();
-  };
-
   const handleSyncNow = async () => {
-    if (pat.trim()) localStorage.setItem(PAT_KEY, pat.trim());
     setPushStatus('pushing');
     setPushError('');
     try {
-      const result = await onSyncNow();
-      if (result === 'no-pat') { setPushStatus('error'); setPushError('No token saved.'); return; }
+      await onSyncNow();
       setPushStatus('ok');
     } catch (e) {
       setPushStatus('error');
-      setPushError(e.message);
+      setPushError(e.message + ' — make sure proxy.js is running locally.');
     }
   };
 
@@ -1458,36 +1443,28 @@ function SyncSettingsModal({ onClose, onSyncNow }) {
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal" style={{maxWidth:500}}>
         <div className="modal-header">
-          <span className="modal-title">☁ Auto-sync Setup</span>
+          <span className="modal-title">☁ Sync to S3</span>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
         <div className="modal-body">
           <p className="hint" style={{marginBottom:12}}>
-            Enter a GitHub fine-grained Personal Access Token with <strong>Contents: Read and Write</strong> access to the <code>jramos83/property-analyser</code> repo. The token is stored only in this browser.
+            Property data is read from the private S3 bucket <code>property-analyser-app</code> on page load.
           </p>
-          <p className="hint" style={{marginBottom:16}}>
-            Create one at: <strong>GitHub → Settings → Developer settings → Fine-grained tokens</strong>
+          <p className="hint" style={{marginBottom:12}}>
+            To push local changes back to S3, the local proxy must be running:
           </p>
-          <input
-            type="password"
-            style={{width:'100%',padding:'12px 14px',background:'#0a0c14',border:'1px solid var(--border)',borderRadius:'var(--radius-sm)',color:'var(--text)',fontSize:14,fontFamily:'monospace'}}
-            value={pat}
-            onChange={e => setPat(e.target.value)}
-            placeholder="github_pat_..."
-            autoFocus
-          />
-          {pushStatus === 'ok' && <p style={{color:'var(--green)',marginTop:10,fontSize:13}}>✓ Pushed successfully — reload other devices to see changes.</p>}
-          {pushStatus === 'error' && <p style={{color:'var(--red)',marginTop:10,fontSize:13}}>⚠ {pushError || 'Push failed.'}</p>}
+          <pre style={{background:'#0a0c14',border:'1px solid var(--border)',borderRadius:'var(--radius-sm)',padding:'10px 14px',fontSize:13,fontFamily:'monospace',marginBottom:12,overflow:'auto'}}>node proxy.js</pre>
+          <p className="hint" style={{marginBottom:12}}>
+            With the proxy running, every change auto-saves to S3 within ~1.5s. Click <strong>Push now</strong> to force an immediate sync.
+          </p>
+          {pushStatus === 'ok' && <p style={{color:'var(--green)',marginTop:10,fontSize:13}}>✓ Pushed to S3 — reload other devices to see changes.</p>}
+          {pushStatus === 'error' && <p style={{color:'var(--red)',marginTop:10,fontSize:13}}>⚠ {pushError}</p>}
         </div>
         <div className="modal-footer">
-          {localStorage.getItem(PAT_KEY) && (
-            <button className="btn btn-danger btn-sm" onClick={() => { localStorage.removeItem(PAT_KEY); onClose(); }}>Clear token</button>
-          )}
-          <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
-          <button className="btn btn-secondary" onClick={handleSyncNow} disabled={pushStatus === 'pushing'}>
+          <button className="btn btn-ghost" onClick={onClose}>Close</button>
+          <button className="btn btn-primary" onClick={handleSyncNow} disabled={pushStatus === 'pushing'}>
             {pushStatus === 'pushing' ? '↻ Pushing…' : '☁ Push now'}
           </button>
-          <button className="btn btn-primary" onClick={save}>Save</button>
         </div>
       </div>
     </div>
@@ -1544,9 +1521,9 @@ function App() {
 
   useEffect(() => { saveProperties(properties); }, [properties]);
 
-  // On startup, fetch from GitHub Pages (same origin) and merge
+  // On startup, fetch from S3 (CORS-enabled) and merge
   useEffect(() => {
-    fetch('properties.json')
+    fetch(S3_URL, { cache: 'no-cache' })
       .then(r => r.ok ? r.json() : null)
       .then(remote => {
         if (!remote || !remote.length) return;
@@ -1556,15 +1533,14 @@ function App() {
       .finally(() => { initialized.current = true; });
   }, []);
 
-  // Auto-save to GitHub 1.5s after any change
+  // Auto-save to S3 via local proxy 1.5s after any change
   useEffect(() => {
     if (!initialized.current) return;
     clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(async () => {
       setSyncStatus('saving');
       try {
-        const result = await githubSave(properties);
-        if (result === 'no-pat') { setSyncStatus('idle'); return; }
+        await proxySave(properties);
         setSyncStatus('saved');
         setTimeout(() => setSyncStatus('idle'), 2500);
       } catch {
@@ -1639,16 +1615,13 @@ function App() {
     e.target.value = '';
   };
 
-  const hasPat = !!localStorage.getItem(PAT_KEY);
   const syncLabel = syncStatus === 'saving' ? '↻ Saving…'
-                  : syncStatus === 'saved'  ? '✓ Saved'
-                  : syncStatus === 'error'  ? '⚠ Sync error'
-                  : hasPat                  ? '☁ Synced'
-                  :                          '☁ Set up sync';
+                  : syncStatus === 'saved'  ? '✓ Saved to S3'
+                  : syncStatus === 'error'  ? '⚠ Proxy offline'
+                  :                           '☁ S3 sync';
   const syncColor = syncStatus === 'saved'  ? 'var(--green)'
-                  : syncStatus === 'error'  ? 'var(--red)'
-                  : hasPat                  ? 'var(--accent)'
-                  :                          undefined;
+                  : syncStatus === 'error'  ? 'var(--amber)'
+                  :                           undefined;
 
   const selectedProperties = properties.filter(p => selectedIds.includes(p.id));
 
@@ -1700,7 +1673,7 @@ function App() {
       </main>
 
       {showAddModal && <AddPropertyModal onClose={() => setShowAddModal(false)} onAdd={handleAdd} />}
-      {showSyncModal && <SyncSettingsModal onClose={() => setShowSyncModal(false)} onSyncNow={() => githubSave(properties)} />}
+      {showSyncModal && <SyncSettingsModal onClose={() => setShowSyncModal(false)} onSyncNow={() => proxySave(properties)} />}
     </div>
   );
 }
