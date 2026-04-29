@@ -28,7 +28,7 @@
       "price_assessment": "overpriced",
       "suburb_trend": "Rising",
       "confidence": "Medium",
-      "reasoning": "Penrith 3-bed/1-bath houses on standard residential blocks were trading in the $900,000–$960,000 range through Q1 2026, with renovated stock pushing into the high-$900Ks. The asking range of $1,150,000–$1,200,000 implies a $200,000+ premium over comparable residential stock, which is only justified by the R3 Medium Density zoning enabling potential dual-occupancy or duplex development. A reasonable land-uplift attribution for confirmed R3 with viable lot dimensions is $80,000–$140,000, which supports a fair value around $1,040,000. The vendor is asking for the full development premium without the buyer having yet verified that the development is feasible — that's a risk transfer to the buyer. Western Sydney Airport opening in late 2026 is a known tailwind already partially priced in across the corridor."
+      "reasoning": "Penrith 3-bed/1-bath houses on standard residential blocks were trading in the $900,000-$960,000 range through Q1 2026, with renovated stock pushing into the high-$900Ks. The asking range of $1,150,000-$1,200,000 implies a $200,000+ premium over comparable residential stock, which is only justified by the R3 Medium Density zoning enabling potential dual-occupancy or duplex development. A reasonable land-uplift attribution for confirmed R3 with viable lot dimensions is $80,000-$140,000, which supports a fair value around $1,040,000. The vendor is asking for the full development premium without the buyer having yet verified that the development is feasible - that's a risk transfer to the buyer. Western Sydney Airport opening in late 2026 is a known tailwind already partially priced in across the corridor."
     },
     "rental": {
       "estimated_weekly_rent": 600,
@@ -57,11 +57,11 @@
     "due_diligence": {
       "red_flags": [
         {
-          "flag": "Asking price embeds the full R3 development premium ($100K+) but the buyer assumes all development risk — feasibility, council approval, construction cost, and market timing.",
+          "flag": "Asking price embeds the full R3 development premium ($100K+) but the buyer assumes all development risk - feasibility, council approval, construction cost, and market timing.",
           "severity": "high"
         },
         {
-          "flag": "Single bathroom on a 3-bed house caps both rental demand (most family tenants want 2 bath) and resale liquidity. Adding an ensuite is a $25K–$40K project before any development.",
+          "flag": "Single bathroom on a 3-bed house caps both rental demand (most family tenants want 2 bath) and resale liquidity. Adding an ensuite is a $25K-$40K project before any development.",
           "severity": "medium"
         },
         {
@@ -69,7 +69,7 @@
           "severity": "high"
         },
         {
-          "flag": "Land size, frontage, and Section 10.7 zoning certificate are not in the listing — these are essential to validate the R3 development thesis. Insufficient data to make a development call.",
+          "flag": "Land size, frontage, and Section 10.7 zoning certificate are not in the listing - these are essential to validate the R3 development thesis. Insufficient data to make a development call.",
           "severity": "high"
         },
         {
@@ -84,7 +84,7 @@
           "priority": "high"
         },
         {
-          "item": "Confirm minimum lot size for dual-occupancy / duplex under Penrith LEP 2010 (clause 4.1B) — typically 600m²+ for duplex.",
+          "item": "Confirm minimum lot size for dual-occupancy / duplex under Penrith LEP 2010 (clause 4.1B) - typically 600m2+ for duplex.",
           "priority": "high"
         },
         {
@@ -92,7 +92,7 @@
           "priority": "high"
         },
         {
-          "item": "Pest and building inspection — single-bathroom layout suggests original fitout with potential deferred maintenance.",
+          "item": "Pest and building inspection - single-bathroom layout suggests original fitout with potential deferred maintenance.",
           "priority": "high"
         },
         {
@@ -100,7 +100,7 @@
           "priority": "high"
         },
         {
-          "item": "Get 2–3 rental appraisals from local Penrith property managers — current market rent is the single biggest variable in the holding cost.",
+          "item": "Get 2-3 rental appraisals from local Penrith property managers - current market rent is the single biggest variable in the holding cost.",
           "priority": "high"
         },
         {
@@ -108,7 +108,7 @@
           "priority": "medium"
         },
         {
-          "item": "Negotiate hard — open with $1,030,000–$1,050,000 based on residential comparables plus R3 floor premium.",
+          "item": "Negotiate hard - open with $1,030,000-$1,050,000 based on residential comparables plus R3 floor premium.",
           "priority": "medium"
         },
         {
@@ -124,7 +124,7 @@
       "transport_access": "Penrith Station (T1 Western Line, ~55 min to Sydney CBD) approximately 1.5 km. Kingswood Station also nearby. Direct M4 Motorway access east toward Parramatta and the Sydney CBD. Regular bus routes on surrounding arterials.",
       "amenities": "Westfield Penrith and Nepean Village shopping precincts within 2 km. Nepean Hospital (major regional hospital) nearby. East Bank dining and entertainment precinct along the Nepean River. Stafford Street local shops walkable.",
       "growth_drivers": [
-        "Western Sydney International Airport opening late 2026 — 28,000+ jobs forecast in the Western Parkland City",
+        "Western Sydney International Airport opening late 2026 - 28,000+ jobs forecast in the Western Parkland City",
         "Aerotropolis precinct development and planned Sydney Metro Western Sydney Airport rail link",
         "Nepean Hospital expansion and Penrith health/education precinct investment",
         "Penrith designated as a strategic regional CBD in the Greater Sydney Region Plan",
@@ -137,12 +137,12 @@
       "yield": 3,
       "location": 7,
       "risk": 6,
-      "verdict": "31 Rosedale Avenue is a development-optionality play priced as if the development is a done deal — but the buyer hasn't yet verified that the R3 zoning translates to a feasible duplex on this specific lot. At $1,175,000 the asking sits roughly 13% above comparable residential 3-bed/1-bath stock in Penrith, with the gap representing the implied land uplift from R3. Yield economics are tough: $600/week rent against ~$5,600/month repayments at 6% leaves a ~$25K/year holding cost before depreciation. The Western Sydney Airport thesis is real but is already partially priced into the entire corridor. This property suits a buyer who (a) verifies development feasibility BEFORE bidding, (b) can hold for 5+ years to capture the airport-driven growth cycle, and (c) has the cash flow to absorb negative gearing of $20K–$25K/year. Walk-away price for a passive investor: $1,050,000. Walk-away price for a developer who has confirmed duplex viability: $1,150,000–$1,180,000. Negotiate hard."
+      "verdict": "31 Rosedale Avenue is a development-optionality play priced as if the development is a done deal - but the buyer hasn't yet verified that the R3 zoning translates to a feasible duplex on this specific lot. At $1,175,000 the asking sits roughly 13% above comparable residential 3-bed/1-bath stock in Penrith, with the gap representing the implied land uplift from R3. Yield economics are tough: $600/week rent against ~$5,600/month repayments at 6% leaves a ~$25K/year holding cost before depreciation. The Western Sydney Airport thesis is real but is already partially priced into the entire corridor. This property suits a buyer who (a) verifies development feasibility BEFORE bidding, (b) can hold for 5+ years to capture the airport-driven growth cycle, and (c) has the cash flow to absorb negative gearing of $20K-$25K/year. Walk-away price for a passive investor: $1,050,000. Walk-away price for a developer who has confirmed duplex viability: $1,150,000-$1,180,000. Negotiate hard."
     }
   },
   {
     "id": "1746057600000",
-    "analysed_at": "2026-04-29T00:30:00.000Z",
+    "analysed_at": "2026-04-29T01:30:00.000Z",
     "analysis_type": "rental",
     "listing": {
       "address": "1/286 Willoughby Road",
@@ -157,17 +157,17 @@
       "car_spaces": 1,
       "floor_size_sqm": null,
       "days_on_market": null,
-      "description_summary": "Modern first-floor three-bedroom, two-bathroom security apartment in the heart of Naremburn. Features open plan living opening to an entertaining terrace, ducted A/C, gas kitchen with stainless steel appliances, internal laundry, and one carspace. All bedrooms have built-ins; main has ensuite. No pets permitted."
+      "description_summary": "Modern first-floor 3-bed/2-bath security apartment in central Naremburn. Three double bedrooms all with built-ins, master with ensuite, gas kitchen with stainless steel appliances, open plan living opening to entertaining terrace, ducted A/C, internal laundry, single car space. NO PETS allowed."
     },
     "rent_assessment": {
-      "fair_weekly_rent": 1075,
-      "suburb_median_weekly_rent": 1050,
-      "rent_gap_pct": 4.7,
-      "assessment": "above market",
+      "fair_weekly_rent": 1175,
+      "suburb_median_weekly_rent": 1180,
+      "rent_gap_pct": -4.26,
+      "assessment": "below market",
       "market_trend": "Rising",
       "vacancy_rate_pct": 1.4,
       "confidence": "Medium",
-      "reasoning": "Three-bedroom apartments on Willoughby Road in Naremburn typically rent in the $1,000–$1,150/week range. The suburb median for 3-bed apartments sits around $1,050/week. This property commands a modest premium given ducted A/C, a private terrace, internal laundry, and secure parking. However, its Willoughby Road frontage tempers the premium. Fair value is estimated at $1,075/week; the $1,125 ask is approximately 4.7% above fair market. The North Shore rental market remains tight with a vacancy rate of ~1.4%. A $25–$50/week reduction is worth attempting."
+      "reasoning": "Naremburn 3-bed apartment median rent sat at approximately $1,150-$1,200/week through Q1 2026, with renovated 3-bed/2-bath stock (especially with parking and outdoor space) trading at the upper end. This property has the full premium feature set - 2 bathrooms, parking, internal laundry, terrace, ducted A/C, security building - which would normally support $1,200-$1,250. The $1,125 ask is approximately 4-5% below the suburb fair-value benchmark. This is favourable for a tenant. Possible reasons for the discount: older building (likely 1980s/90s), NO PETS restriction limits the applicant pool, or the agent priced for a quick let to avoid vacancy. Either way, a tenant who can move quickly is getting genuine value."
     },
     "affordability": {
       "weekly_rent": 1125,
@@ -186,54 +186,66 @@
     "due_diligence": {
       "red_flags": [
         {
-          "flag": "Willoughby Road frontage — a busy arterial road. Inspect at peak hour to assess noise levels.",
+          "flag": "Strict NO PETS clause - confirms strata bylaw is enforceable. Tenants with pets should not apply; this is non-negotiable.",
+          "severity": "high"
+        },
+        {
+          "flag": "First-floor apartment fronting Willoughby Road - a busy arterial. Likely traffic noise to front-facing rooms; inspect at peak hour and check window glazing.",
           "severity": "medium"
         },
         {
-          "flag": "Strict no-pets policy stated explicitly. Not suitable for tenants with pets.",
+          "flag": "Building age likely 1980s/90s - confirm internal condition, soundproofing between units, and presence of any deferred maintenance flagged in recent strata reports.",
           "severity": "medium"
         },
         {
-          "flag": "Inspection requires online registration at www.davidmurphy.com.au.",
+          "flag": "Single car space for a 3-bed apartment may be inadequate for a 2-car household; on-street parking on Willoughby Road is restricted.",
+          "severity": "medium"
+        },
+        {
+          "flag": "Rent ~$58,500/year requires household income of ~$195K to meet the 30% affordability rule - confirms this is a high-income suburb skew.",
           "severity": "low"
         }
       ],
       "days_on_market_flag": false,
       "checklist": [
         {
-          "item": "Visit at peak hour (7–9am, 4–7pm) to assess road noise from Willoughby Road",
+          "item": "Inspect at peak weekday traffic hours to assess noise from Willoughby Road.",
           "priority": "high"
         },
         {
-          "item": "Request a copy of the strata by-laws to confirm pet restrictions and other restrictions",
+          "item": "Confirm lease term offered (12 months standard) and break-lease fee structure with the agent.",
           "priority": "high"
         },
         {
-          "item": "Register online at www.davidmurphy.com.au before attending the open home",
+          "item": "Test internet/NBN connection type and speed at the address - older buildings sometimes have FTTB or congested wiring.",
           "priority": "high"
         },
         {
-          "item": "Confirm which carspace is allocated and whether visitor parking is available",
+          "item": "Verify the car space is secure (basement vs. open) and confirm exact location/dimensions.",
+          "priority": "high"
+        },
+        {
+          "item": "Request copy of strata bylaws - confirm rules on deliveries, balcony use, removalists, after-hours noise.",
           "priority": "medium"
         },
         {
-          "item": "Check all appliances during inspection",
+          "item": "Check water and electricity bill arrangements - strata often covers water in older blocks.",
           "priority": "medium"
         },
         {
-          "item": "Ask agent about strata levies and any upcoming capital works",
+          "item": "Inspect ensuite and main bathroom for water damage, mould, working extraction fans.",
           "priority": "medium"
         },
         {
-          "item": "Negotiate rent — $1,075–$1,100/week is justifiable given the road-facing position",
+          "item": "Test all gas kitchen appliances and confirm a current gas safety certificate.",
           "priority": "medium"
         },
         {
-          "item": "Confirm bond amount and preferred lease term",
+          "item": "Ask whether the apartment has been freshly painted/cleaned for the new tenancy.",
           "priority": "low"
         },
         {
-          "item": "Check NBN connection type available in the building",
+          "item": "Confirm bond amount (max 4 weeks = $4,500) and rent in advance (max 2 weeks = $2,250).",
           "priority": "low"
         }
       ]
@@ -241,22 +253,22 @@
     "location": {
       "flood_risk": "Low",
       "bushfire_risk": "Low",
-      "schools_nearby": "Naremburn Public School within walking distance. Crows Nest area has multiple private schools nearby.",
-      "transport_access": "Excellent — Willoughby Road has frequent buses to CBD and Crows Nest Metro. St Leonards station approx. 1.5km away.",
-      "amenities": "Naremburn village strip with cafes and shops. Crows Nest dining precinct 5 min away. Willoughby Leisure Centre nearby.",
+      "schools_nearby": "Naremburn Public School and Cammeray Public School (both highly regarded) within walking distance. Willoughby Girls High School and Cammeray Public are catchment options. Catholic schools (Marist Sisters' College North Sydney) and private (Wenona, Shore) within short drive.",
+      "transport_access": "Bus services along Willoughby Road run direct to North Sydney and CBD (express buses ~20 min to CBD). St Leonards train station ~1.5 km (T1 North Shore Line, ~12 min to Wynyard). Crows Nest Metro station (Sydney Metro, opened 2024) ~1 km - fast direct access to Martin Place and Barangaroo. Excellent transport.",
+      "amenities": "Willoughby Road local shops, cafes, and restaurants directly at the property's doorstep. Crows Nest dining and entertainment precinct ~1 km. Naremburn Park and Flat Rock Gully Reserve nearby. Westfield Chatswood ~3 km. Royal North Shore Hospital ~1.5 km.",
       "growth_drivers": [
-        "Proximity to Crows Nest Metro station",
-        "Tight North Shore rental vacancy",
-        "Urban village character",
-        "Limited new apartment supply in Naremburn"
+        "Sydney Metro Crows Nest station (opened 2024) significantly improved CBD commute times and is driving sustained rental demand across Naremburn / Crows Nest / St Leonards",
+        "Lower North Shore remains one of Sydney's tightest rental markets with vacancy under 1.5%",
+        "Proximity to St Leonards/Royal North Shore health & innovation precinct supports strong professional tenant demand",
+        "Established premium suburb with stable demographic and strong school catchments - limited new supply"
       ]
     },
     "score": {
-      "overall": 7,
-      "value": 6,
-      "location": 8,
-      "risk": 8,
-      "verdict": "A solid, well-appointed apartment in one of Sydney inner-north’s most liveable suburbs. Ticks key tenant boxes — ducted A/C, parking, terrace, internal laundry — with excellent transport. The Willoughby Road position warrants a noise inspection before committing. At $1,125/week the rent is ~4.7% above fair market; a household income of $195,000+ meets the 30% rule. Negotiate to $1,075–$1,100/week. Not suitable for pet owners. Recommended subject to positive noise inspection and a negotiation attempt."
+      "overall": 8,
+      "value": 8,
+      "location": 9,
+      "risk": 7,
+      "verdict": "1/286 Willoughby Road is a well-priced rental for a 3-bed/2-bath apartment in Naremburn - the $1,125/week ask sits ~4% below the suburb fair-value benchmark for comparable stock with parking, ensuite and outdoor space. Naremburn's location is hard to fault: walking distance to Crows Nest Metro (12 min to Martin Place), Willoughby Road cafes, top-tier school catchments, and Royal North Shore Hospital. The main caveats are tenant-specific: the strict NO PETS clause is a hard exclusion, the front-facing position on Willoughby Road means traffic noise (worth inspecting at peak hour), and the single car space limits two-car households. For a working professional, couple, or small family with one car and no pets, this is a genuinely good rental - apply quickly because mid-priced 3-bed apartments in this corridor typically lease within 2 weeks. Negotiate by offering a longer lease (24 months) in exchange for either a small rent reduction or fixing the rent for the term."
     }
   },
   {
@@ -284,7 +296,7 @@
       "price_assessment": "overpriced",
       "price_gap_pct": 4.79,
       "confidence": "Medium",
-      "reasoning": "Comparable 2-bedroom apartments in Baulkham Hills have been transacting between $700,000 and $780,000 through Q1 2026, with a median around $730,000 for 80–90 sqm floor plates in large strata complexes. The asking price of $765,000 sits approximately 4.8% above fair value. Confidence is medium as the specific floor level, aspect, and internal condition are unconfirmed.",
+      "reasoning": "Comparable 2-bedroom apartments in Baulkham Hills have been transacting between $700,000 and $780,000 through Q1 2026, with a median around $730,000 for 80\u201390 sqm floor plates in large strata complexes. The asking price of $765,000 sits approximately 4.8% above fair value. Confidence is medium as the specific floor level, aspect, and internal condition are unconfirmed.",
       "suburb_trend": "Rising",
       "comparable_range_low": 700000,
       "comparable_range_high": 800000
@@ -307,7 +319,7 @@
     "due_diligence": {
       "red_flags": [
         {
-          "flag": "Net yield of 2.55% is well below prevailing mortgage rates (6–7%), meaning the property will be deeply negatively geared — approximately $2,200–$3,800/month out of pocket at 80% LVR before tax.",
+          "flag": "Net yield of 2.55% is well below prevailing mortgage rates (6\u20137%), meaning the property will be deeply negatively geared \u2014 approximately $2,200\u2013$3,800/month out of pocket at 80% LVR before tax.",
           "severity": "high"
         },
         {
@@ -315,15 +327,15 @@
           "severity": "medium"
         },
         {
-          "flag": "Seven Hills Road is a busy arterial road — traffic noise and lack of green outlook on lower floors may reduce rental appeal and achievable rent.",
+          "flag": "Seven Hills Road is a busy arterial road \u2014 traffic noise and lack of green outlook on lower floors may reduce rental appeal and achievable rent.",
           "severity": "medium"
         },
         {
-          "flag": "Strata fees unconfirmed — Hills District complexes of this scale often carry levies of $5,000–$9,000/year and may have sinking fund deficiencies or pending special levies.",
+          "flag": "Strata fees unconfirmed \u2014 Hills District complexes of this scale often carry levies of $5,000\u2013$9,000/year and may have sinking fund deficiencies or pending special levies.",
           "severity": "medium"
         },
         {
-          "flag": "21 days on market without sale may indicate the market is testing buyer appetite at this price point — negotiate accordingly.",
+          "flag": "21 days on market without sale may indicate the market is testing buyer appetite at this price point \u2014 negotiate accordingly.",
           "severity": "low"
         }
       ],
@@ -341,7 +353,7 @@
           "priority": "high"
         },
         {
-          "item": "Request rental appraisal from 2–3 local property managers to validate the $610/week estimate",
+          "item": "Request rental appraisal from 2\u20133 local property managers to validate the $610/week estimate",
           "priority": "high"
         },
         {
@@ -349,7 +361,7 @@
           "priority": "high"
         },
         {
-          "item": "Inspect the specific floor level and aspect — confirm whether the unit faces the road or a quieter orientation",
+          "item": "Inspect the specific floor level and aspect \u2014 confirm whether the unit faces the road or a quieter orientation",
           "priority": "medium"
         },
         {
@@ -377,7 +389,7 @@
       "strata_applicable": true
     },
     "location": {
-      "schools_nearby": "Baulkham Hills High School (selective, highly ranked), Matthew Pearce Public School, and Hills Grammar are all within 2–4 km. The strong public and private schooling catchment is a primary demand driver for families in this suburb.",
+      "schools_nearby": "Baulkham Hills High School (selective, highly ranked), Matthew Pearce Public School, and Hills Grammar are all within 2\u20134 km. The strong public and private schooling catchment is a primary demand driver for families in this suburb.",
       "transport_access": "Sydney Metro Northwest stations at Castle Hill (3 km) and Norwest (4 km) provide CBD access in under 40 minutes. Multiple T-way bus routes operate along Seven Hills Road. The M2 Motorway on-ramp is within 2 km, offering fast freeway access to the CBD and Parramatta.",
       "amenities": "Baulkham Hills town centre is walkable. Castle Towers (major regional shopping centre) is 3 km away. Norwest Business Park (major employment hub) is 4 km. Local cafes, medical centres, gyms, and childcare facilities are nearby.",
       "flood_risk": "Low",
@@ -399,7 +411,7 @@
       "yield": 4,
       "location": 8,
       "risk": 6,
-      "verdict": "Baulkham Hills is a high-quality, defensive Sydney suburb with excellent schools, Metro access, and a growing employment catchment — fundamentals that support long-term capital preservation. However, at $765,000 with a gross yield of just 4.14% and a deeply negative cash flow of roughly $2,200–$3,800 per month before tax at current rates, this property is a capital-growth play that demands significant holding capacity. Investors should negotiate toward $730,000–$740,000, verify strata health thoroughly, and obtain a depreciation schedule before proceeding. The 7–10 year outlook is sound for those who can sustain the cash flow burden; short-term investors or those at their borrowing limit should look elsewhere."
+      "verdict": "Baulkham Hills is a high-quality, defensive Sydney suburb with excellent schools, Metro access, and a growing employment catchment \u2014 fundamentals that support long-term capital preservation. However, at $765,000 with a gross yield of just 4.14% and a deeply negative cash flow of roughly $2,200\u2013$3,800 per month before tax at current rates, this property is a capital-growth play that demands significant holding capacity. Investors should negotiate toward $730,000\u2013$740,000, verify strata health thoroughly, and obtain a depreciation schedule before proceeding. The 7\u201310 year outlook is sound for those who can sustain the cash flow burden; short-term investors or those at their borrowing limit should look elsewhere."
     }
   },
   {
@@ -427,7 +439,7 @@
       "price_assessment": "Overpriced",
       "price_gap_pct": 5.9,
       "confidence": "Medium",
-      "reasoning": "Comparable 3-bedroom townhouses in Baulkham Hills on quieter streets have transacted between $1.08M and $1.32M over the past 12 months, but Windsor Road's status as a high-traffic arterial typically applies a 5–10% discount relative to equivalent off-road stock due to noise, air quality, and reduced resale appeal. At $1.175M, the asking price does not appear to fully price in this location penalty. A fair value of $1.11M better reflects the road-facing discount and current strata townhouse comparables in 2153.",
+      "reasoning": "Comparable 3-bedroom townhouses in Baulkham Hills on quieter streets have transacted between $1.08M and $1.32M over the past 12 months, but Windsor Road's status as a high-traffic arterial typically applies a 5\u201310% discount relative to equivalent off-road stock due to noise, air quality, and reduced resale appeal. At $1.175M, the asking price does not appear to fully price in this location penalty. A fair value of $1.11M better reflects the road-facing discount and current strata townhouse comparables in 2153.",
       "suburb_trend": "Moderate Growth",
       "comparable_range_low": 1020000,
       "comparable_range_high": 1280000
@@ -450,11 +462,11 @@
     "due_diligence": {
       "red_flags": [
         {
-          "flag": "Windsor Road is one of the busiest arterial roads in The Hills District — persistent traffic noise and air quality concerns are likely to suppress tenant demand, limit rental premiums, and reduce the pool of future buyers at resale.",
+          "flag": "Windsor Road is one of the busiest arterial roads in The Hills District \u2014 persistent traffic noise and air quality concerns are likely to suppress tenant demand, limit rental premiums, and reduce the pool of future buyers at resale.",
           "severity": "high"
         },
         {
-          "flag": "Net yield of ~1.9% results in substantial negative gearing. At 6% interest on a $940K loan, annual cash shortfall before tax will exceed $44,000 — unsuitable for investors without high taxable income or significant capital buffers.",
+          "flag": "Net yield of ~1.9% results in substantial negative gearing. At 6% interest on a $940K loan, annual cash shortfall before tax will exceed $44,000 \u2014 unsuitable for investors without high taxable income or significant capital buffers.",
           "severity": "high"
         },
         {
@@ -462,7 +474,7 @@
           "severity": "medium"
         },
         {
-          "flag": "Strata sinking fund status unknown — older complexes on main roads can have deferred maintenance obligations (fencing, driveway, common area noise attenuation) that trigger special levies.",
+          "flag": "Strata sinking fund status unknown \u2014 older complexes on main roads can have deferred maintenance obligations (fencing, driveway, common area noise attenuation) that trigger special levies.",
           "severity": "medium"
         },
         {
@@ -476,7 +488,7 @@
           "priority": "high"
         },
         {
-          "item": "Commission independent building and pest inspection — pay particular attention to shared party walls, driveway, and any road-side sound insulation",
+          "item": "Commission independent building and pest inspection \u2014 pay particular attention to shared party walls, driveway, and any road-side sound insulation",
           "priority": "high"
         },
         {
@@ -484,7 +496,7 @@
           "priority": "high"
         },
         {
-          "item": "Review Section 10.7 certificate for flood overlay, heritage constraints, and road widening corridors — Windsor Road is subject to potential future widening",
+          "item": "Review Section 10.7 certificate for flood overlay, heritage constraints, and road widening corridors \u2014 Windsor Road is subject to potential future widening",
           "priority": "high"
         },
         {
@@ -516,7 +528,7 @@
           "priority": "low"
         },
         {
-          "item": "Investigate reason for 22 days on market — ask selling agent directly about prior offers",
+          "item": "Investigate reason for 22 days on market \u2014 ask selling agent directly about prior offers",
           "priority": "low"
         }
       ],
@@ -524,8 +536,8 @@
       "strata_applicable": true
     },
     "location": {
-      "schools_nearby": "Baulkham Hills Public School (~700m), Baulkham Hills High School — selective, consistently top-10 in NSW (~1.2km), Gilroy Catholic College (~1.5km), Hills Grammar School (private, ~2.5km). School catchment is a genuine demand driver for family buyers.",
-      "transport_access": "Windsor Road bus routes (700/700X) provide direct services to Parramatta and the CBD. Castle Hill Metro Station (Sydney Metro Northwest) is approximately 5km away — car or bus connection required, limiting walkability to rapid transit. Highly car-dependent for daily commuting.",
+      "schools_nearby": "Baulkham Hills Public School (~700m), Baulkham Hills High School \u2014 selective, consistently top-10 in NSW (~1.2km), Gilroy Catholic College (~1.5km), Hills Grammar School (private, ~2.5km). School catchment is a genuine demand driver for family buyers.",
+      "transport_access": "Windsor Road bus routes (700/700X) provide direct services to Parramatta and the CBD. Castle Hill Metro Station (Sydney Metro Northwest) is approximately 5km away \u2014 car or bus connection required, limiting walkability to rapid transit. Highly car-dependent for daily commuting.",
       "amenities": "Stockland Baulkham Hills shopping centre within 600m offering major supermarkets, medical, and specialty retail. Norwest Business Park (10 min drive) provides significant local employment. Various gyms, restaurants, and medical facilities nearby on Windsor Road.",
       "flood_risk": "Low",
       "bushfire_risk": "Low",
@@ -546,7 +558,7 @@
       "yield": 4,
       "location": 6,
       "risk": 5,
-      "verdict": "Baulkham Hills offers genuine family appeal — selective school catchment, improving infrastructure, and a stable tenant base — but this specific townhouse carries two compounding negatives: a main-road position that the asking price fails to adequately discount, and a yield so thin it demands significant ongoing cash subsidisation. A price of $1.05M–$1.1M would substantially improve the investment case; at $1.175M, patient negotiation or walking away are both defensible positions."
+      "verdict": "Baulkham Hills offers genuine family appeal \u2014 selective school catchment, improving infrastructure, and a stable tenant base \u2014 but this specific townhouse carries two compounding negatives: a main-road position that the asking price fails to adequately discount, and a yield so thin it demands significant ongoing cash subsidisation. A price of $1.05M\u2013$1.1M would substantially improve the investment case; at $1.175M, patient negotiation or walking away are both defensible positions."
     }
   },
   {
@@ -597,11 +609,11 @@
     "due_diligence": {
       "red_flags": [
         {
-          "flag": "Gross yield of ~2.2% indicates significant negative gearing. At 6% interest, annual cash shortfall exceeds $95,000 before tax — requires high taxable income to benefit from negative gearing offset.",
+          "flag": "Gross yield of ~2.2% indicates significant negative gearing. At 6% interest, annual cash shortfall exceeds $95,000 before tax \u2014 requires high taxable income to benefit from negative gearing offset.",
           "severity": "high"
         },
         {
-          "flag": "Duplex/semi title type should be confirmed as Torrens or Strata — strata levies could increase materially if the scheme has deferred capital works.",
+          "flag": "Duplex/semi title type should be confirmed as Torrens or Strata \u2014 strata levies could increase materially if the scheme has deferred capital works.",
           "severity": "medium"
         },
         {
@@ -623,7 +635,7 @@
           "priority": "high"
         },
         {
-          "item": "Review strata financials — check sinking fund balance and any upcoming special levies",
+          "item": "Review strata financials \u2014 check sinking fund balance and any upcoming special levies",
           "priority": "high"
         },
         {
@@ -659,7 +671,7 @@
           "priority": "low"
         },
         {
-          "item": "Investigate reason for 18 days on market — speak with selling agent directly",
+          "item": "Investigate reason for 18 days on market \u2014 speak with selling agent directly",
           "priority": "low"
         }
       ],
@@ -668,7 +680,7 @@
     },
     "location": {
       "schools_nearby": "Chatswood Public School (650m), Chatswood High School (1.1km), Our Lady of Dolours Catholic Primary (800m), St Patrick's Primary (900m). Catchment for Chatswood High is a key value driver for family buyers.",
-      "transport_access": "Chatswood Station (T1 North Shore Line) approximately 750m walk — direct service to City Circle and North Sydney. Bus interchange adjacent to station. Future Sydney Metro West connectivity cements the suburb's long-term transport premium.",
+      "transport_access": "Chatswood Station (T1 North Shore Line) approximately 750m walk \u2014 direct service to City Circle and North Sydney. Bus interchange adjacent to station. Future Sydney Metro West connectivity cements the suburb's long-term transport premium.",
       "amenities": "Westfield Chatswood and Chatswood Chase within 800m providing major retail, dining, and entertainment. Strong medical precinct including private specialists. Chatswood CBD offers gym, cinema, and extensive F&B options.",
       "flood_risk": "Low",
       "bushfire_risk": "Low",
@@ -689,7 +701,7 @@
       "yield": 3,
       "location": 9,
       "risk": 7,
-      "verdict": "A blue-chip North Shore semi in one of Sydney's most tightly held suburbs — excellent for long-term capital growth but delivers a sub-2.2% gross yield that demands deep pockets and a high income to service. Best suited to an investor with a 10+ year horizon or an owner-occupier who values school catchment, lifestyle, and rail access over cash flow."
+      "verdict": "A blue-chip North Shore semi in one of Sydney's most tightly held suburbs \u2014 excellent for long-term capital growth but delivers a sub-2.2% gross yield that demands deep pockets and a high income to service. Best suited to an investor with a 10+ year horizon or an owner-occupier who values school catchment, lifestyle, and rail access over cash flow."
     }
   }
 ]
